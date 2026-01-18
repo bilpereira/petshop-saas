@@ -1,0 +1,4688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Pet Shop Transport</title>
+    
+    <!-- SISTEMA DE LICENCIAMENTO -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script>
+        // Configuração do sistema de licenciamento
+        const LICENSE_CONFIG = {
+            TEST_KEY: "PST-WVVI-UK1U-X7YO",
+            SUPABASE_URL: "https://awirsiozohdgmmplugcl.supabase.co",
+            SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc"
+        };
+    </script>
+    
+    <style>
+        /* ============ VARIÁVEIS CSS ============ */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --success-dark: #047857;
+            --warning: #f59e0b;
+            --warning-dark: #d97706;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --pix-green: #32BCAD;
+            --pix-dark: #2A9B8E;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            
+            --primary-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --success-gradient: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            --warning-gradient: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+            --danger-gradient: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+            --pix-gradient: linear-gradient(135deg, var(--pix-green) 0%, var(--pix-dark) 100%);
+            
+            --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.16);
+            --shadow-xl: 0 10px 32px rgba(0, 0, 0, 0.2);
+            
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ============ RESET & BASE ============ */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #fae8ff 50%, #fef3c7 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 15px;
+            animation: gradientBG 15s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        
+        /* ============ ESTILOS DO SISTEMA DE LICENCIAMENTO ============ */
+        #license-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999 !important;
+            padding: 20px;
+        }
+        
+        .license-container {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .license-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .license-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .license-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .license-header h2 {
+            margin: 10px 0 0 0;
+            font-size: 18px;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+        
+        .license-body {
+            padding: 30px;
+        }
+        
+        .license-icon {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        .license-info {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .license-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .license-input-group {
+                flex-direction: column;
+            }
+        }
+        
+        .license-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .license-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .license-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .license-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .license-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .license-status {
+            min-height: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .license-status .success {
+            color: #10b981;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .license-status .error {
+            color: #ef4444;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .license-status .info {
+            color: #3b82f6;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .license-features {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .license-features h3 {
+            margin-top: 0;
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .license-features ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #475569;
+        }
+        
+        .license-features li {
+            margin-bottom: 8px;
+        }
+        
+        .license-support {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .license-support h3 {
+            margin-top: 0;
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .license-support p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.6;
+        }
+        
+        .license-footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            padding: 20px 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        /* Indicador de Licença no Header */
+        .license-indicator {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            margin-right: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .license-indicator:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .license-indicator span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Aviso de Expiração */
+        #license-warning {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99998;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .license-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .license-warning button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 10px;
+            line-height: 1;
+        }
+        
+        /* Esconder conteúdo principal quando tela de licença está ativa */
+        body:has(#license-screen:not([style*="display: none"])) .container {
+            display: none !important;
+        }
+        
+        body:has(#license-screen:not([style*="display: none"])) .history-btn {
+            display: none !important;
+        }
+        
+        /* ============ HEADER COM CONTADORES ============ */
+        .header { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            animation: slideInDown 0.5s ease-out;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(59, 130, 246, 0.05) 50%,
+                transparent 70%
+            );
+            animation: shine 8s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
+        }
+        
+        .header-content { 
+            flex: 1; 
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 { 
+            font-size: 28px; 
+            color: transparent;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), #ec4899);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: textShine 3s ease-in-out infinite alternate;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        @keyframes textShine {
+            to { background-position: 200% center; }
+        }
+        
+        .header p { 
+            color: var(--gray-600); 
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .stat-badge .count {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .user-badge { 
+            background: var(--primary-gradient);
+            color: white; 
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px; 
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .user-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .user-badge:hover::before {
+            left: 100%;
+        }
+        
+        .user-badge.admin { 
+            background: var(--success-gradient);
+        }
+        
+        /* ============ BOTÕES ADMIN ============ */
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        
+        .clear-delivered-btn {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+        
+        .clear-delivered-btn:hover {
+            background: linear-gradient(90deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .clear-delivered-btn.visible {
+            display: block;
+        }
+        
+        .clear-database-btn {
+            background: linear-gradient(90deg, #7c3aed, #6d28d9);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+        
+        .clear-database-btn:hover {
+            background: linear-gradient(90deg, #6d28d9, #5b21b6);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .clear-database-btn.visible {
+            display: block;
+        }
+        
+        /* ============ MODAIS ============ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-pix {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            width: 350px;
+            max-width: 90vw;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--glass-border);
+            animation: slideInUp 0.4s ease-out;
+            text-align: center;
+        }
+        
+        .modal-confirm {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            width: 350px;
+            max-width: 90vw;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--glass-border);
+            animation: slideInUp 0.4s ease-out;
+        }
+        
+        .modal-pix h3,
+        .modal-confirm h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .qrcode-container {
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qrcode-img {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        
+        .pix-info {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .pix-info p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pix-info strong {
+            color: var(--gray-900);
+            min-width: 80px;
+            display: inline-block;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .modal-btn.copy {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .modal-btn.confirm {
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        .modal-btn.close {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* ============ STATUS & SYNC ============ */
+        .sync-status { 
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 12px 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #92400e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid #fbbf24;
+            animation: fadeIn 0.6s ease-out 0.2s backwards;
+        }
+        
+        .sync-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .connection-dots {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: dotPulse 1.4s infinite;
+            box-shadow: 0 0 8px #10b981;
+        }
+        
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes dotPulse {
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: scale(0.8); 
+                box-shadow: 0 0 4px #10b981;
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1); 
+                box-shadow: 0 0 12px #10b981;
+            }
+        }
+        
+        .sync-btn { 
+            background: var(--primary-gradient);
+            color: white; 
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sync-btn::after {
+            content: '🔄';
+            transition: transform 0.3s;
+        }
+        
+        .sync-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .sync-btn:hover::after {
+            transform: rotate(180deg);
+        }
+        
+        /* ============ BUSCA MOTORISTA ============ */
+        .search-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--glass-border);
+            display: none;
+        }
+        
+        .search-container.visible {
+            display: block;
+            animation: slideInDown 0.4s ease-out;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-results {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .search-results.visible {
+            display: block;
+        }
+        
+        .search-result-item {
+            padding: 10px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-result-item:hover {
+            background: var(--gray-100);
+            transform: translateX(3px);
+        }
+        
+        /* ============ DESTAQUE PRÓXIMA RETIRADA - CORRIGIDO ============ */
+        .next-pickup-highlight {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: pulse 2s infinite;
+            position: relative;
+            overflow: visible;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: var(--shadow-lg); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.3); }
+        }
+        
+        .next-pickup-highlight::before {
+            content: '⏰ PRÓXIMA RETIRADA';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .next-pickup-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .next-pickup-content .icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        
+        .next-pickup-content h3 {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 18px;
+            line-height: 1.3;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .next-pickup-pets {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .next-pickup-pet {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #8b5cf6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            overflow: visible;
+        }
+        
+        .next-pickup-pet:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .next-pickup-pet.priority {
+            border-left-color: #ef4444;
+        }
+        
+        .next-pickup-pet .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .next-pickup-pet .info {
+            flex: 1;
+            min-width: 0;
+            overflow: visible;
+        }
+        
+        .next-pickup-pet .name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 2px;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        
+        .next-pickup-pet .details {
+            font-size: 12px;
+            color: var(--gray-600);
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        
+        .next-pickup-pet .priority-badge {
+            font-size: 10px;
+            color: #ef4444;
+            font-weight: 600;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+        
+        /* ============ BOTÕES ============ */
+        .add-btn { 
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            display: none;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+        
+        .add-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .add-btn:hover::before {
+            left: 100%;
+        }
+        
+        .add-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .add-btn.visible { 
+            display: block; 
+            animation: slideInUp 0.5s ease-out;
+        }
+        
+        /* ============ FORMULÁRIO COM VALOR PIX ============ */
+        .form-container { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            padding: 25px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid var(--glass-border);
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .form-container.active { 
+            display: block; 
+            animation: slideInUp 0.4s ease-out;
+        }
+        
+        .form-container h2 { 
+            font-size: 22px; 
+            color: var(--gray-900); 
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            font-weight: 600; 
+            color: var(--gray-700); 
+            margin-bottom: 8px; 
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .form-group input, 
+        .form-group select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid var(--gray-200); 
+            border-radius: 12px; 
+            font-size: 14px; 
+            transition: var(--transition);
+            background: white;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus, 
+        .form-group select:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-row { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+        }
+        
+        .submit-btn { 
+            width: 100%; 
+            background: var(--success-gradient);
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .submit-btn:disabled { 
+            background: var(--gray-300); 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* ============ LISTA DE PETS ============ */
+        .pets-list { 
+            display: grid; 
+            gap: 20px; 
+        }
+        
+        .pet-card { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 20px;
+            border-left: 6px solid var(--primary);
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+            opacity: 1;
+            transform: translateY(0);
+            animation: slideInUp 0.5s ease-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pet-card.smooth-move {
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .pet-card:hover::before {
+            opacity: 1;
+        }
+        
+        .pet-card:nth-child(1) { animation-delay: 0.1s; }
+        .pet-card:nth-child(2) { animation-delay: 0.2s; }
+        .pet-card:nth-child(3) { animation-delay: 0.3s; }
+        .pet-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .pet-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .pet-card.arquivado { 
+            border-left: 6px solid var(--gray-300); 
+            opacity: 0.8;
+            background: linear-gradient(135deg, var(--glass-bg) 0%, #f1f5f9 100%);
+        }
+        
+        .pet-card.arquivado:hover {
+            opacity: 0.9;
+        }
+        
+        /* ============ ESTILO PARA ADMIN VER ARQUIVADOS ============ */
+        .pet-card.admin-arquivado {
+            border-left: 6px solid var(--gray-400);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            opacity: 0.9;
+            position: relative;
+        }
+        
+        .pet-card.admin-arquivado:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+        
+        .pet-card.admin-arquivado::after {
+            content: '📁 Arquivado';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .pet-card.priority-high {
+            border-left: 6px solid var(--warning);
+            animation: priorityPulse 2s infinite;
+        }
+        
+        @keyframes priorityPulse {
+            0%, 100% { box-shadow: var(--shadow-lg); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.3); }
+        }
+        
+        /* ============ HEADER DO CARD ============ */
+        .pet-card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 15px; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        
+        .pet-name-section { 
+            flex: 1; 
+            min-width: 200px; 
+        }
+        
+        .pet-name-section h3 { 
+            font-size: 24px; 
+            color: transparent;
+            background: linear-gradient(90deg, var(--gray-900), var(--gray-700));
+            -webkit-background-clip: text;
+            background-clip: text;
+            margin-bottom: 5px; 
+            font-weight: 700;
+        }
+        
+        .pet-name-section p { 
+            font-size: 16px; 
+            color: var(--gray-600); 
+            font-weight: 500; 
+        }
+        
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .badge-status { 
+            display: inline-block; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-status::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        .badge-status.aguardando { 
+            background: var(--warning-gradient);
+            color: white;
+        }
+        
+        .badge-status.caminho { 
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+        
+        .badge-status.entregue { 
+            background: var(--success-gradient);
+            color: white;
+        }
+        
+        .badge-status.pago { 
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            color: white;
+        }
+        
+        .badge-status.nao-pago { 
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        .pet-details-right { 
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            min-width: 250px;
+        }
+        
+        .pet-time { 
+            color: var(--gray-600); 
+            font-size: 14px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px;
+            justify-content: flex-end;
+        }
+        
+        .pet-time strong { 
+            color: var(--gray-900); 
+        }
+        
+        .hora-entregue { 
+            color: var(--success); 
+            font-weight: 600; 
+            font-size: 13px; 
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: flex-end;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* ============ BOTÕES DE AÇÃO ============ */
+        .delete-btn { 
+            background: var(--danger-gradient);
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: var(--transition);
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .delete-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .delete-btn.visible { 
+            display: block; 
+        }
+        
+        /* ============ BOTÃO PIX ============ */
+        .pix-btn { 
+            background: var(--pix-gradient);
+            color: white; 
+            border: none; 
+            width: 44px;
+            height: 44px;
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 20px;
+            font-weight: 600; 
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            margin-left: 8px;
+        }
+        
+        .pix-btn:hover { 
+            transform: translateY(-2px) scale(1.1); 
+            box-shadow: 0 6px 15px rgba(50, 188, 173, 0.4);
+        }
+        
+        /* ============ BOTÃO EDITAR (ADMIN) ============ */
+        .edit-btn { 
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: var(--transition);
+            display: none;
+            box-shadow: var(--shadow-md);
+            margin-left: 8px;
+        }
+        
+        .edit-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .edit-btn.visible { 
+            display: inline-block; 
+        }
+        
+        /* ============ INFORMAÇÕES DO PET ============ */
+        .pet-info { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 12px; 
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 15px; 
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .pet-info-item { 
+            color: var(--gray-600); 
+        }
+        
+        .pet-info-item strong { 
+            color: var(--gray-900); 
+            font-weight: 600;
+        }
+        
+        .pet-address { 
+            margin-bottom: 15px; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px; 
+            border: 2px solid #bfdbfe;
+            position: relative;
+        }
+        
+        .pet-address p { 
+            color: var(--primary-dark); 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            line-height: 1.5;
+        }
+        
+        .copy-address-btn { 
+            background: linear-gradient(90deg, #60a5fa, var(--primary));
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .copy-address-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* ============ SEÇÃO DE STATUS ============ */
+        .status-section { 
+            padding-top: 15px; 
+            border-top: 2px solid var(--gray-200); 
+        }
+        
+        .status-buttons { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+        
+        .status-btn { 
+            flex: 1; 
+            min-width: 140px; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: var(--transition);
+            background: var(--gray-100); 
+            color: var(--gray-700); 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .status-btn:hover::before {
+            left: 100%;
+        }
+        
+        .status-btn.active { 
+            background: var(--primary-gradient);
+            color: white; 
+            box-shadow: var(--shadow-md);
+        }
+        
+        .status-btn.pago-btn { 
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            color: white; 
+        }
+        
+        .status-btn.nao-pago-btn { 
+            background: var(--danger-gradient);
+            color: white; 
+        }
+        
+        .status-btn.sutil { 
+            background: linear-gradient(90deg, #93c5fd, #60a5fa);
+            color: white; 
+        }
+        
+        .status-btn:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .status-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            transform: none !important;
+        }
+        
+        /* ============ SESSÃO VALOR RECEBIDO ============ */
+        .valor-recebido-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 12px;
+            border: 2px solid #86efac;
+            display: none;
+        }
+        
+        .valor-recebido-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .valor-recebido-label {
+            font-weight: 700;
+            color: var(--success-dark);
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .valor-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .valor-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #86efac;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            background: white;
+        }
+        
+        .valor-input:focus {
+            outline: none;
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+        
+        .confirmar-valor-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        
+        .confirmar-valor-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* ============ OBSERVAÇÕES OTIMIZADAS ============ */
+        .observacoes-container { 
+            margin-top: 15px; 
+        }
+        
+        .observacoes-label { 
+            font-weight: 600; 
+            color: var(--gray-900); 
+            font-size: 13px; 
+            margin-bottom: 6px; 
+            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .observacoes { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid var(--gray-200); 
+            border-radius: 10px; 
+            font-family: inherit; 
+            font-size: 13px; 
+            margin-bottom: 12px; 
+            min-height: 80px; 
+            resize: vertical; 
+            transition: var(--transition);
+            line-height: 1.4;
+        }
+        
+        .observacoes:focus {
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .observacoes-admin { 
+            border-color: var(--success); 
+            background: #f0fdf4; 
+        }
+        
+        .observacoes-admin:focus {
+            border-color: var(--success-dark);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .observacoes-motorista { 
+            border-color: var(--primary); 
+            background: #eff6ff; 
+        }
+        
+        .observacoes-motorista:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .observacoes-readonly { 
+            background: var(--gray-50); 
+            color: var(--gray-600); 
+            cursor: not-allowed;
+        }
+        
+        /* ============ HISTÓRICO DE ENTREGAS ============ */
+        .delivered-sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-xl);
+            z-index: 999;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .delivered-sidebar.active {
+            right: 0;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        .sidebar-header h3 {
+            font-size: 20px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: var(--transition);
+        }
+        
+        .close-sidebar:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+        
+        .delivered-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .delivered-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        
+        .delivered-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .delivered-item.paid {
+            border-left-color: var(--success);
+        }
+        
+        .delivered-item.unpaid {
+            border-left-color: var(--danger);
+        }
+        
+        .delivered-item h4 {
+            font-size: 16px;
+            color: var(--gray-900);
+            margin-bottom: 5px;
+        }
+        
+        .delivered-item p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+        
+        .delivered-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-paid {
+            background: var(--success-gradient);
+            color: white;
+        }
+        
+        .status-unpaid {
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        /* ============ BOTÃO HISTÓRICO ============ */
+        .history-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-xl);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 998;
+            transition: var(--transition);
+        }
+        
+        .history-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* ============ ESTADO VAZIO ============ */
+        .empty-state { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 50px 30px;
+            text-align: center;
+            color: var(--gray-600);
+            border: 1px solid var(--glass-border);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .empty-state p:first-child { 
+            font-size: 22px; 
+            margin-bottom: 15px; 
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--gray-700), var(--gray-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .empty-state p:last-child { 
+            font-size: 16px; 
+        }
+        
+        /* ============ BOTÃO TOGGLE PAGAMENTO ============ */
+        .toggle-pagamento-btn {
+            background: linear-gradient(90deg, #93c5fd, #60a5fa);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .toggle-pagamento-btn:hover {
+            background: linear-gradient(90deg, #60a5fa, #3b82f6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .toggle-pagamento-btn .arrow {
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+        
+        .toggle-pagamento-btn.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        /* ============ SEÇÃO PAGAMENTO ============ */
+        .pagamento-section {
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 200px;
+            opacity: 1;
+            margin-bottom: 15px;
+        }
+        
+        .pagamento-section.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            padding: 0;
+        }
+        
+        /* ============ BOTÕES PAGO/NÃO PAGO ============ */
+        .pagamento-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .pagamento-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .pagamento-btn.pago {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .pagamento-btn.nao-pago {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .pagamento-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pagamento-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ============ BADGE DE STATUS ============ */
+        .payment-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .payment-status-badge.pago {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+            border: 1px solid #10b981;
+        }
+        
+        .payment-status-badge.nao-pago {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+        
+        .payment-status-badge.pendente {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid #f59e0b;
+        }
+        
+        /* ============ NOVOS ESTILOS PARA MELHORIAS ============ */
+        
+        /* Cards visuais recolhíveis */
+        .visual-counters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .visual-counter-card {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .visual-counter-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .visual-counter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .visual-counter-header h4 {
+            font-size: 14px;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .visual-counter-toggle {
+            background: none;
+            border: none;
+            font-size: 12px;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .visual-counter-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        
+        .visual-counter-content.expanded {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .pet-list-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .pet-mini-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .pet-mini-item:hover {
+            background: var(--gray-100);
+            transform: translateX(3px);
+        }
+        
+        .pet-mini-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .pet-mini-info {
+            flex: 1;
+            font-size: 12px;
+            color: var(--gray-700);
+        }
+        
+        .pet-mini-info strong {
+            color: var(--gray-900);
+        }
+        
+        /* Botões de prioridade (apenas alta e média) */
+        .priority-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .priority-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .priority-btn.alta {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .priority-btn.media {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .priority-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .priority-btn.active {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            transform: translateY(0);
+        }
+        
+        /* Botão próxima retirada */
+        .next-pickup-btn {
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 8px;
+        }
+        
+        .next-pickup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .next-pickup-btn.active {
+            background: linear-gradient(90deg, #ec4899, #d946ef);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Formulário multi-pet agrupado */
+        .multi-pets-container {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px dashed #cbd5e1;
+        }
+        
+        .multi-pet-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .multi-pet-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .multi-pet-number {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .multi-pet-fields {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .remove-pet-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .add-pet-btn {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .add-pet-btn:hover {
+            background: var(--gray-300);
+            transform: translateY(-2px);
+        }
+        
+        /* Display de múltiplos pets no card */
+        .multi-pets-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .pet-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--gray-100);
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+        
+        .pet-tag-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* Botão admin marcar como pago */
+        .admin-pagamento-btn {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 8px;
+        }
+        
+        .admin-pagamento-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* ============ ANIMAÇÕES ============ */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* ============ RESPONSIVO ============ */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .pet-name-section h3 {
+                font-size: 22px;
+            }
+            
+            .delivered-sidebar {
+                width: 300px;
+                right: -300px;
+            }
+            
+            .pet-details-right {
+                min-width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header { 
+                flex-direction: column; 
+                text-align: center; 
+                gap: 15px; 
+                padding: 15px;
+            }
+            
+            .header-content { 
+                text-align: center; 
+            }
+            
+            .stats-container {
+                justify-content: center;
+            }
+            
+            .form-row, 
+            .status-buttons { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .status-btn { 
+                min-width: 100%; 
+            }
+            
+            .pet-card-header { 
+                flex-direction: column; 
+                text-align: center;
+            }
+            
+            .pet-name-section, 
+            .pet-details-right { 
+                text-align: center; 
+                width: 100%; 
+            }
+            
+            .pet-details-right { 
+                margin-top: 10px; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .observacoes { 
+                min-height: 70px; 
+            }
+            
+            .pet-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .delivered-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .history-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .valor-input-container {
+                flex-direction: column;
+            }
+            
+            .valor-input {
+                width: 100%;
+            }
+            
+            .multi-pet-fields {
+                grid-template-columns: 1fr;
+            }
+            
+            .pet-details-right {
+                min-width: 100%;
+                align-items: center;
+            }
+            
+            .admin-buttons {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .clear-delivered-btn,
+            .clear-database-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body { 
+                padding: 10px; 
+            }
+            
+            .header, 
+            .pet-card, 
+            .form-container { 
+                padding: 15px; 
+            }
+            
+            .header h1 { 
+                font-size: 22px; 
+            }
+            
+            .pet-name-section h3 { 
+                font-size: 20px; 
+            }
+            
+            .pet-card {
+                padding: 15px;
+            }
+            
+            .form-container {
+                padding: 20px 15px;
+            }
+            
+            .status-btn {
+                padding: 10px;
+            }
+            
+            .observacoes {
+                min-height: 60px;
+                font-size: 12px;
+            }
+            
+            .modal-pix {
+                padding: 20px;
+            }
+            
+            .qrcode-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .qrcode-img {
+                width: 220px;
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TELA DE ATIVAÇÃO DE LICENÇA (SERÁ INJETADA VIA JAVASCRIPT) -->
+    
+    <!-- MODAL PIX -->
+    <div class="modal-overlay" id="pixModal">
+        <div class="modal-pix">
+            <h3>💰 Pagamento PIX</h3>
+            <div class="qrcode-container">
+                <img src="https://i.imgur.com/paZK1Tx.png" 
+                     alt="QR Code PIX" 
+                     class="qrcode-img"
+                     onerror="this.onerror=null; this.src='https://imgur.com/paZK1Tx'">
+            </div>
+            <div class="pix-info">
+                <p>🔢 <strong>Chave:</strong> 34.508.807/0001-51</p>
+                <p>👤 <strong>Beneficiário:</strong> PET SHOP BOSQUE DA SAUDE</p>
+                <p>💵 <strong>Valor:</strong> R$ <span id="pixValor">50,00</span></p>
+                <p>📱 <strong>Status:</strong> <span id="pixStatus">Aguardando pagamento</span></p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn copy" onclick="copiarChavePix()">📋 Copiar Chave</button>
+                <button class="modal-btn close" onclick="fecharModalPix()">✖ Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL CONFIRMAR LIMPEZA -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-confirm">
+            <h3>⚠️ Limpar Banco de Dados</h3>
+            <p style="margin-bottom: 15px; color: var(--gray-700);">
+                Esta ação irá <strong>apagar TODOS os pets</strong> permanentemente.<br>
+                Digite a senha para confirmar:
+            </p>
+            <input type="password" 
+                   class="modal-input" 
+                   id="confirmPassword" 
+                   placeholder="Digite a senha: admin123"
+                   onkeypress="if(event.key === 'Enter') confirmarLimpeza()">
+            <div class="modal-buttons">
+                <button class="modal-btn confirm" onclick="confirmarLimpeza()">🗑️ Limpar Tudo</button>
+                <button class="modal-btn close" onclick="fecharModalConfirm()">✖ Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- HISTÓRICO DE ENTREGAS -->
+    <div class="delivered-sidebar" id="deliveredSidebar">
+        <div class="sidebar-header">
+            <h3>📋 Entregues Hoje</h3>
+            <button class="close-sidebar" onclick="toggleDeliveredSidebar()">×</button>
+        </div>
+        <div class="delivered-list" id="deliveredList">
+            <!-- Itens serão preenchidos via JavaScript -->
+        </div>
+    </div>
+    
+    <!-- BOTÃO FLUTUANTE HISTÓRICO -->
+    <button class="history-btn" onclick="toggleDeliveredSidebar()">
+        📋
+    </button>
+    
+    <div class="container">
+        <!-- Cabeçalho Premium -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🐾 Pet Shop Transport</h1>
+                <p id="userRole">Sistema premium de transporte de pets</p>
+                
+                <!-- Cards visuais recolhíveis para Admin/Motorista -->
+                <div class="visual-counters" id="visualCounters" style="display: none;">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+                
+                <!-- Busca para Motorista -->
+                <div class="search-container" id="searchContainer" style="display: none;">
+                    <input type="text" 
+                           class="search-input" 
+                           id="searchInput" 
+                           placeholder="🔍 Buscar cliente ou pet..."
+                           onkeyup="filtrarPets(this.value)">
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="user-badge" id="userBadge">Motorista</div>
+                <div class="admin-buttons" id="adminButtons">
+                    <button class="clear-delivered-btn" id="clearDeliveredBtn" onclick="zerarPetsEntregues()">
+                        🗑️ Zerar Entregues
+                    </button>
+                    <button class="clear-database-btn" id="clearDatabaseBtn" onclick="mostrarModalLimpeza()">
+                        💣 Limpar Banco
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status de Sincronização -->
+        <div class="sync-status">
+            <div class="sync-info">
+                <span>✅ Conectado | Última: <span id="lastUpdate">--:--:--</span></span>
+                <div class="connection-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <button class="sync-btn" onclick="carregarPets(true)">
+                <span>Atualizar</span>
+            </button>
+        </div>
+        
+        <!-- Área de Destaque Próxima Retirada -->
+        <div class="next-pickup-highlight" id="nextPickupHighlight" style="display: none;">
+            <!-- Conteúdo será preenchido via JavaScript -->
+        </div>
+        
+        <!-- Botão Adicionar (só admin) -->
+        <button class="add-btn" id="addBtn" onclick="mostrarFormulario()">
+            <span>➕ Adicionar Pet</span>
+        </button>
+        
+        <!-- Formulário com campo VALOR PIX -->
+        <div class="form-container" id="formContainer">
+            <h2>📝 Novo Transporte</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>👤 Cliente</label>
+                    <input type="text" id="cliente" placeholder="Ex: Maria Silva">
+                </div>
+                <div class="form-group">
+                    <label>📍 Endereço</label>
+                    <input type="text" id="endereco" placeholder="Av. Nossa Senhora da Saúde 403">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🕐 Hora Retirada</label>
+                    <input type="time" id="horaRetirada" value="14:30">
+                </div>
+                <div class="form-group">
+                    <label>💰 Valor PIX (R$)</label>
+                    <input type="number" id="valorPix" step="0.01" min="0" placeholder="50.00" value="50.00">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>⏱️ Tempo Estimado</label>
+                    <input type="text" id="tempo" placeholder="Ex: 12 minutos">
+                </div>
+            </div>
+            
+            <!-- Primeiro Pet -->
+            <div class="multi-pets-container">
+                <h4 style="margin-bottom: 15px; color: var(--gray-700); display: flex; align-items: center; gap: 8px;">
+                    🐕 Pet 1
+                </h4>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Pet</label>
+                        <input type="text" id="nomePet" placeholder="Ex: Max">
+                    </div>
+                    <div class="form-group">
+                        <label>🎨 Raça</label>
+                        <select id="raca">
+                            <option value="">Selecione</option>
+                            <option>Shitzu</option>
+                            <option>Poodle</option>
+                            <option>Labrador</option>
+                            <option>Bulldog</option>
+                            <option>Golden Retriever</option>
+                            <option>Vira-lata</option>
+                            <option>Persa</option>
+                            <option>Siamês</option>
+                            <option>Maine Coon</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🌈 Cor</label>
+                        <select id="cor">
+                            <option value="">Selecione</option>
+                            <option>Marrom</option>
+                            <option>Branco</option>
+                            <option>Preto</option>
+                            <option>Caramelo</option>
+                            <option>Cinza</option>
+                            <option>Malhado</option>
+                            <option>Outra</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para pets adicionais -->
+            <div id="additionalPetsContainer"></div>
+            
+            <!-- Botão para adicionar mais pets -->
+            <button type="button" class="add-pet-btn" id="addPetBtn" onclick="adicionarNovoPet()">
+                ➕ Adicionar Outro Pet
+            </button>
+            
+            <button class="submit-btn" onclick="adicionarPet()">
+                <span>✨ Adicionar Transporte</span>
+            </button>
+        </div>
+        
+        <!-- Lista de Pets -->
+        <div class="pets-list" id="petsList"></div>
+    </div>
+
+    <script>
+        // ========== CONFIGURAÇÃO ==========
+        const JSONBIN_CONFIG = {
+            BIN_ID: '695de16743b1c97be91e7eeb',
+            API_KEY: '$2a$10$Wmft46BmqMcXpiI3zbasQ.4xVnNwAtOSxia383nb1GxXxojFbX.Nm',
+            API_URL: 'https://api.jsonbin.io/v3/b'
+        };
+
+        // Detectar modo
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('modo') === 'admin';
+
+        let pets = [];
+        let editingPetId = null;
+        let isReordering = false;
+        let totalPetsNoForm = 1;
+        let petsAdicionais = [];
+
+        // ========== PIX CONFIG ==========
+        const PIX_CONFIG = {
+            chave: '34.508.807/0001-51',
+            beneficiario: 'PET SHOP BOSQUE DA SAUDE',
+            qrcodeUrl: 'https://i.imgur.com/paZK1Tx.png',
+            qrcodeBackup: 'https://imgur.com/paZK1Tx'
+        };
+
+        // ========== SISTEMA DE LICENCIAMENTO ==========
+        class LicenseValidator {
+            constructor() {
+                this.supabaseUrl = LICENSE_CONFIG.SUPABASE_URL;
+                this.supabaseKey = LICENSE_CONFIG.SUPABASE_KEY;
+                this.supabase = null;
+                this.licenseData = null;
+                this.initSupabase();
+                this.initLicenseCheck();
+            }
+
+            initSupabase() {
+                try {
+                    this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    console.log('✅ Cliente Supabase inicializado');
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar Supabase:', error);
+                }
+            }
+
+            getLocalLicense() {
+                return {
+                    key: localStorage.getItem('pst_license_key'),
+                    clienteId: localStorage.getItem('pst_cliente_id'),
+                    clienteNome: localStorage.getItem('pst_cliente_nome'),
+                    validade: localStorage.getItem('pst_validade'),
+                    plano: localStorage.getItem('pst_plano')
+                };
+            }
+
+            saveLocalLicense(licenseData) {
+                if (licenseData) {
+                    localStorage.setItem('pst_license_key', licenseData.chave || '');
+                    localStorage.setItem('pst_cliente_id', licenseData.cliente_id || '');
+                    localStorage.setItem('pst_cliente_nome', licenseData.cliente_nome || 'Cliente Pet Shop');
+                    localStorage.setItem('pst_validade', licenseData.data_vencimento || '');
+                    localStorage.setItem('pst_plano', licenseData.plano || 'basico');
+                    localStorage.setItem('pst_last_validation', new Date().toISOString());
+                }
+            }
+
+            clearLocalLicense() {
+                localStorage.removeItem('pst_license_key');
+                localStorage.removeItem('pst_cliente_id');
+                localStorage.removeItem('pst_cliente_nome');
+                localStorage.removeItem('pst_validade');
+                localStorage.removeItem('pst_plano');
+                localStorage.removeItem('pst_last_validation');
+            }
+
+            async validateLicense(licenseKey) {
+                try {
+                    console.log(`🔍 Validando licença: ${licenseKey}`);
+                    
+                    const { data: license, error: licenseError } = await this.supabase
+                        .from('licencas')
+                        .select('*, clientes(*)')
+                        .eq('chave', licenseKey)
+                        .single();
+
+                    if (licenseError || !license) {
+                        return {
+                            valid: false,
+                            message: 'Licença não encontrada',
+                            error: licenseError
+                        };
+                    }
+
+                    const expirationDate = new Date(license.data_vencimento);
+                    const now = new Date();
+                    
+                    if (expirationDate < now) {
+                        return {
+                            valid: false,
+                            message: 'Licença vencida',
+                            licenseData: license
+                        };
+                    }
+
+                    if (!license.data_ativacao) {
+                        return {
+                            valid: false,
+                            message: 'Licença não ativada',
+                            licenseData: license
+                        };
+                    }
+
+                    if (!license.clientes) {
+                        return {
+                            valid: false,
+                            message: 'Cliente não encontrado',
+                            licenseData: license
+                        };
+                    }
+
+                    const licenseData = {
+                        ...license,
+                        cliente_nome: license.clientes.nome || license.clientes.cnpj || 'Cliente Pet Shop',
+                        plano: license.clientes.plano || 'basico',
+                        dominio: license.clientes.dominio || ''
+                    };
+
+                    this.saveLocalLicense(licenseData);
+                    
+                    return {
+                        valid: true,
+                        message: 'Licença válida',
+                        licenseData: licenseData
+                    };
+
+                } catch (error) {
+                    console.error('❌ Erro na validação:', error);
+                    return {
+                        valid: false,
+                        message: 'Erro na validação',
+                        error: error.message
+                    };
+                }
+            }
+
+            async activateLicense(licenseKey) {
+                try {
+                    const validation = await this.validateLicense(licenseKey);
+                    
+                    if (validation.valid) {
+                        const { data: license } = await this.supabase
+                            .from('licencas')
+                            .select('data_ativacao')
+                            .eq('chave', licenseKey)
+                            .single();
+
+                        if (!license.data_ativacao) {
+                            await this.supabase
+                                .from('licencas')
+                                .update({ data_ativacao: new Date().toISOString() })
+                                .eq('chave', licenseKey);
+                        }
+
+                        return validation;
+                    }
+                    
+                    return validation;
+                    
+                } catch (error) {
+                    return {
+                        valid: false,
+                        message: 'Erro na ativação',
+                        error: error.message
+                    };
+                }
+            }
+
+            startPeriodicCheck(intervalMinutes = 5) {
+                setInterval(() => {
+                    this.checkLicenseValidity();
+                }, intervalMinutes * 60 * 1000);
+            }
+
+            async checkLicenseValidity() {
+                const localLicense = this.getLocalLicense();
+                
+                if (!localLicense.key) {
+                    return { valid: false, message: 'Nenhuma licença encontrada' };
+                }
+
+                try {
+                    const validation = await this.validateLicense(localLicense.key);
+                    
+                    if (!validation.valid) {
+                        this.clearLocalLicense();
+                        this.showLicenseScreen();
+                    } else {
+                        const expirationDate = new Date(validation.licenseData.data_vencimento);
+                        const now = new Date();
+                        const daysUntilExpiration = Math.ceil((expirationDate - now) / (1000 * 60 * 60 * 24));
+                        
+                        if (daysUntilExpiration <= 3 && daysUntilExpiration > 0) {
+                            this.showExpirationWarning(daysUntilExpiration);
+                        }
+                    }
+                    
+                    return validation;
+                    
+                } catch (error) {
+                    return this.checkLocalValidity();
+                }
+            }
+
+            checkLocalValidity() {
+                const localLicense = this.getLocalLicense();
+                
+                if (!localLicense.key || !localLicense.validade) {
+                    return { valid: false, message: 'Licença não encontrada' };
+                }
+
+                const expirationDate = new Date(localLicense.validade);
+                const now = new Date();
+                
+                if (expirationDate < now) {
+                    return { valid: false, message: 'Licença vencida (offline)' };
+                }
+
+                return {
+                    valid: true,
+                    message: 'Licença válida (offline)',
+                    licenseData: localLicense
+                };
+            }
+
+            showExpirationWarning(daysLeft) {
+                const warningContainer = document.getElementById('license-warning');
+                if (!warningContainer) {
+                    const container = document.createElement('div');
+                    container.id = 'license-warning';
+                    document.body.appendChild(container);
+                }
+
+                warningContainer.innerHTML = `
+                    <div class="license-warning">
+                        <span>⚠️ Sua licença vence em ${daysLeft} dia${daysLeft === 1 ? '' : 's'}. Entre em contato para renovação.</span>
+                        <button onclick="document.getElementById('license-warning').style.display='none'">×</button>
+                    </div>
+                `;
+                warningContainer.style.display = 'block';
+            }
+
+            async initLicenseCheck() {
+                setTimeout(async () => {
+                    const localLicense = this.getLocalLicense();
+                    
+                    if (!localLicense.key) {
+                        this.showLicenseScreen();
+                        return;
+                    }
+
+                    try {
+                        const validation = await this.validateLicense(localLicense.key);
+                        
+                        if (!validation.valid) {
+                            this.clearLocalLicense();
+                            this.showLicenseScreen();
+                        } else {
+                            this.startPeriodicCheck();
+                            this.addLicenseIndicator(validation.licenseData);
+                        }
+                    } catch (error) {
+                        const localValidation = this.checkLocalValidity();
+                        
+                        if (!localValidation.valid) {
+                            this.showLicenseScreen();
+                        } else {
+                            console.warn('📶 Validação offline - conexão indisponível');
+                        }
+                    }
+                }, 100);
+            }
+
+            showLicenseScreen() {
+                let licenseScreen = document.getElementById('license-screen');
+                
+                if (!licenseScreen) {
+                    licenseScreen = document.createElement('div');
+                    licenseScreen.id = 'license-screen';
+                    licenseScreen.innerHTML = this.getLicenseScreenHTML();
+                    document.body.appendChild(licenseScreen);
+                    
+                    setTimeout(() => {
+                        const activateBtn = document.getElementById('activate-license-btn');
+                        const licenseInput = document.getElementById('license-key-input');
+                        
+                        if (activateBtn) {
+                            activateBtn.addEventListener('click', () => {
+                                this.handleActivation();
+                            });
+                        }
+                        
+                        if (licenseInput) {
+                            licenseInput.addEventListener('keypress', (e) => {
+                                if (e.key === 'Enter') {
+                                    this.handleActivation();
+                                }
+                            });
+                        }
+                    }, 100);
+                }
+                
+                licenseScreen.style.display = 'flex';
+                
+                document.querySelector('.container')?.style.setProperty('display', 'none', 'important');
+                document.querySelector('.history-btn')?.style.setProperty('display', 'none', 'important');
+            }
+
+            hideLicenseScreen() {
+                const licenseScreen = document.getElementById('license-screen');
+                if (licenseScreen) {
+                    licenseScreen.style.display = 'none';
+                }
+                
+                document.querySelector('.container')?.style.setProperty('display', 'block', 'important');
+                document.querySelector('.history-btn')?.style.setProperty('display', 'flex', 'important');
+            }
+
+            async handleActivation() {
+                const licenseInput = document.getElementById('license-key-input');
+                const statusMessage = document.getElementById('activation-status');
+                const activateBtn = document.getElementById('activate-license-btn');
+                
+                if (!licenseInput || !statusMessage) return;
+                
+                const licenseKey = licenseInput.value.trim().toUpperCase();
+                
+                if (!licenseKey) {
+                    statusMessage.innerHTML = '<span class="error">⚠️ Por favor, insira uma chave de licença</span>';
+                    return;
+                }
+
+                if (!/^PST-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(licenseKey)) {
+                    statusMessage.innerHTML = '<span class="error">⚠️ Formato inválido. Use: PST-XXXX-XXXX-XXXX</span>';
+                    return;
+                }
+
+                activateBtn.innerHTML = '⏳ Validando...';
+                activateBtn.disabled = true;
+                statusMessage.innerHTML = '<span class="info">🔍 Conectando ao servidor...</span>';
+
+                try {
+                    const result = await this.activateLicense(licenseKey);
+                    
+                    if (result.valid) {
+                        statusMessage.innerHTML = '<span class="success">✅ Licença ativada com sucesso!</span>';
+                        activateBtn.innerHTML = '✅ Redirecionando...';
+                        
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        statusMessage.innerHTML = `<span class="error">❌ ${result.message}</span>`;
+                        activateBtn.innerHTML = '✅ Tentar Novamente';
+                        activateBtn.disabled = false;
+                    }
+                } catch (error) {
+                    statusMessage.innerHTML = `<span class="error">❌ Erro de conexão. Verifique sua internet.</span>`;
+                    activateBtn.innerHTML = '✅ Tentar Novamente';
+                    activateBtn.disabled = false;
+                }
+            }
+
+            addLicenseIndicator(licenseData) {
+                const header = document.querySelector('.header');
+                if (!header) return;
+
+                const oldIndicator = document.getElementById('license-indicator');
+                if (oldIndicator) oldIndicator.remove();
+
+                const indicator = document.createElement('div');
+                indicator.id = 'license-indicator';
+                indicator.className = 'license-indicator';
+                indicator.innerHTML = `
+                    <span title="Licença ${licenseData.plano} - Válida até ${new Date(licenseData.data_vencimento).toLocaleDateString('pt-BR')}">
+                        ✅ ${licenseData.cliente_nome}
+                    </span>
+                `;
+                
+                const userBadge = document.querySelector('.user-badge');
+                if (userBadge && userBadge.parentNode) {
+                    userBadge.parentNode.insertBefore(indicator, userBadge);
+                }
+            }
+
+            getLicenseScreenHTML() {
+                return `
+                    <div class="license-container">
+                        <div class="license-card">
+                            <div class="license-header">
+                                <h1>🚀 Pet Shop Transport</h1>
+                                <h2>Ativação do Sistema</h2>
+                            </div>
+                            
+                            <div class="license-body">
+                                <div class="license-icon">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </div>
+                                
+                                <p class="license-info">
+                                    Para usar o Pet Shop Transport, é necessário uma licença válida.
+                                </p>
+                                
+                                <div class="license-input-group">
+                                    <input 
+                                        type="text" 
+                                        id="license-key-input" 
+                                        placeholder="Digite sua chave (ex: PST-XXXX-XXXX-XXXX)"
+                                        class="license-input"
+                                        value="PST-WVVI-UK1U-X7YO"
+                                    >
+                                    <button id="activate-license-btn" class="license-button">
+                                        ✅ Ativar Licença
+                                    </button>
+                                </div>
+                                
+                                <div id="activation-status" class="license-status">
+                                    <!-- Mensagens de status aparecerão aqui -->
+                                </div>
+                                
+                                <div class="license-features">
+                                    <h3>✨ Recursos Incluídos:</h3>
+                                    <ul>
+                                        <li>✅ Gestão completa de transporte de pets</li>
+                                        <li>✅ Sistema PIX integrado</li>
+                                        <li>✅ Modos Admin e Motorista</li>
+                                        <li>✅ Sincronização em nuvem</li>
+                                        <li>✅ Suporte prioritário</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="license-support">
+                                    <h3>🆘 Precisa de ajuda?</h3>
+                                    <p>
+                                        <strong>Chave de Teste:</strong> PST-WVVI-UK1U-X7YO<br>
+                                        <strong>Suporte:</strong> suporte@petshoptransport.com<br>
+                                        <strong>Telefone:</strong> (11) 99999-9999
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="license-footer">
+                                <p>Pet Shop Transport © ${new Date().getFullYear()} - Sistema de Licenciamento</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ========== FUNÇÕES DE VALIDAÇÃO DE LICENÇA ==========
+        function verificarLicencaInicial() {
+            const localLicense = {
+                key: localStorage.getItem('pst_license_key'),
+                validade: localStorage.getItem('pst_validade')
+            };
+            
+            if (!localLicense.key) {
+                console.log('🔄 Nenhuma licença encontrada, aguardando sistema de licenciamento...');
+                return false;
+            }
+            
+            if (localLicense.validade) {
+                const expirationDate = new Date(localLicense.validade);
+                const now = new Date();
+                
+                if (expirationDate < now) {
+                    console.log('⚠️ Licença vencida');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // ========== FUNÇÕES BÁSICAS ==========
+        function configurarInterface() {
+            if (!verificarLicencaInicial()) {
+                return;
+            }
+            
+            const addBtn = document.getElementById('addBtn');
+            const userBadge = document.getElementById('userBadge');
+            const userRole = document.getElementById('userRole');
+            const visualCounters = document.getElementById('visualCounters');
+            const adminButtons = document.getElementById('adminButtons');
+            const searchContainer = document.getElementById('searchContainer');
+            
+            if (isAdmin) {
+                addBtn.classList.add('visible');
+                userBadge.textContent = 'Administrador';
+                userBadge.classList.add('admin');
+                userRole.textContent = 'Sistema de transporte - Modo Administrador';
+                visualCounters.style.display = 'flex';
+                adminButtons.style.display = 'flex';
+                searchContainer.style.display = 'none';
+            } else {
+                addBtn.classList.remove('visible');
+                userBadge.textContent = 'Motorista';
+                userBadge.classList.remove('admin');
+                userRole.textContent = 'Sistema de transporte - Modo Motorista';
+                visualCounters.style.display = 'flex';
+                adminButtons.style.display = 'none';
+                searchContainer.style.display = 'block';
+            }
+            
+            const localLicense = {
+                key: localStorage.getItem('pst_license_key'),
+                clienteNome: localStorage.getItem('pst_cliente_nome'),
+                plano: localStorage.getItem('pst_plano')
+            };
+            
+            if (localLicense.key && window.licenseValidator) {
+                const licenseData = {
+                    cliente_nome: localLicense.clienteNome || 'Cliente',
+                    plano: localLicense.plano || 'basico',
+                    data_vencimento: localStorage.getItem('pst_validade')
+                };
+                
+                window.licenseValidator.addLicenseIndicator(licenseData);
+            }
+        }
+
+        function mostrarFormulario() {
+            if (!isAdmin) return;
+            const form = document.getElementById('formContainer');
+            const btn = document.getElementById('addBtn');
+            const submitBtn = form.querySelector('.submit-btn');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                btn.textContent = '➕ Adicionar Pet';
+                submitBtn.textContent = '✨ Adicionar Transporte';
+                submitBtn.onclick = adicionarPet;
+                cancelarEdicao();
+                resetarFormularioMultiPet();
+            } else {
+                form.classList.add('active');
+                btn.textContent = '❌ Cancelar';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // ========== FUNÇÕES DO FORMULÁRIO MULTI-PET ==========
+        function resetarFormularioMultiPet() {
+            totalPetsNoForm = 1;
+            petsAdicionais = [];
+            const additionalPetsContainer = document.getElementById('additionalPetsContainer');
+            additionalPetsContainer.innerHTML = '';
+            
+            document.getElementById('nomePet').value = '';
+            document.getElementById('raca').value = '';
+            document.getElementById('cor').value = '';
+        }
+
+        function adicionarNovoPet() {
+            if (totalPetsNoForm >= 5) {
+                mostrarMensagem('⚠️ Máximo de 5 pets por cliente!', 'warning');
+                return;
+            }
+            
+            totalPetsNoForm++;
+            const petId = totalPetsNoForm;
+            
+            const additionalPetsContainer = document.getElementById('additionalPetsContainer');
+            const petDiv = document.createElement('div');
+            petDiv.className = 'multi-pet-item';
+            petDiv.id = `petAdicional${petId}`;
+            
+            petDiv.innerHTML = `
+                <div class="multi-pet-number">${petId}</div>
+                <div class="multi-pet-fields">
+                    <div>
+                        <input type="text" class="nomePetAdicional" placeholder="Nome do Pet" style="width: 100%; padding: 8px; border: 2px solid var(--gray-200); border-radius: 8px;">
+                    </div>
+                    <div>
+                        <select class="racaAdicional" style="width: 100%; padding: 8px; border: 2px solid var(--gray-200); border-radius: 8px;">
+                            <option value="">Raça</option>
+                            <option>Shitzu</option>
+                            <option>Poodle</option>
+                            <option>Labrador</option>
+                            <option>Bulldog</option>
+                            <option>Golden Retriever</option>
+                            <option>Vira-lata</option>
+                            <option>Persa</option>
+                            <option>Siamês</option>
+                            <option>Maine Coon</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select class="corAdicional" style="width: 100%; padding: 8px; border: 2px solid var(--gray-200); border-radius: 8px;">
+                            <option value="">Cor</option>
+                            <option>Marrom</option>
+                            <option>Branco</option>
+                            <option>Preto</option>
+                            <option>Caramelo</option>
+                            <option>Cinza</option>
+                            <option>Malhado</option>
+                            <option>Outra</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="remove-pet-btn" onclick="removerPetAdicional(${petId})">×</button>
+            `;
+            
+            additionalPetsContainer.appendChild(petDiv);
+            
+            petsAdicionais.push({
+                id: petId,
+                nomePet: '',
+                raca: '',
+                cor: ''
+            });
+        }
+
+        function removerPetAdicional(petId) {
+            const petDiv = document.getElementById(`petAdicional${petId}`);
+            if (petDiv) {
+                petDiv.remove();
+                totalPetsNoForm--;
+                
+                petsAdicionais = petsAdicionais.filter(p => p.id !== petId);
+                
+                const petItems = document.querySelectorAll('.multi-pet-item');
+                petItems.forEach((item, index) => {
+                    const newId = index + 2;
+                    item.id = `petAdicional${newId}`;
+                    const numberDiv = item.querySelector('.multi-pet-number');
+                    if (numberDiv) numberDiv.textContent = newId;
+                    
+                    const removeBtn = item.querySelector('.remove-pet-btn');
+                    if (removeBtn) {
+                        removeBtn.onclick = function() { removerPetAdicional(newId); };
+                    }
+                    
+                    const petIndex = petsAdicionais.findIndex(p => p.id === parseInt(item.id.replace('petAdicional', '')));
+                    if (petIndex !== -1) {
+                        petsAdicionais[petIndex].id = newId;
+                    }
+                });
+            }
+        }
+
+        // ========== ORDENAÇÃO DINÂMICA ==========
+        function aplicarOrdenacaoDinamicaCorrigida() {
+            if (isReordering) return;
+            isReordering = true;
+            
+            let petsVisiveis = pets.filter(p => !p.arquivado);
+            
+            const emTransporte = petsVisiveis.filter(p => 
+                p.status === 'A caminho da loja' || 
+                p.status === 'A caminho da entrega' ||
+                p.status === 'A caminho retirada'
+            );
+            
+            const outros = petsVisiveis.filter(p => 
+                !(p.status === 'A caminho da loja' || 
+                  p.status === 'A caminho da entrega' || 
+                  p.status === 'A caminho retirada')
+            );
+            
+            emTransporte.sort((a, b) => {
+                const statusOrder = {
+                    'A caminho da loja': 1,
+                    'A caminho da entrega': 2,
+                    'A caminho retirada': 3
+                };
+                
+                const orderA = statusOrder[a.status] || 999;
+                const orderB = statusOrder[b.status] || 999;
+                
+                if (orderA !== orderB) {
+                    return orderA - orderB;
+                }
+                
+                return (a.horaRetirada || '').localeCompare(b.horaRetirada || '');
+            });
+            
+            const novaOrdem = [...emTransporte, ...outros];
+            
+            pets.forEach(pet => {
+                const novoPet = novaOrdem.find(p => p.id === pet.id);
+                if (novoPet) {
+                    Object.assign(pet, novoPet);
+                }
+            });
+            
+            salvarPets();
+            isReordering = false;
+            return novaOrdem;
+        }
+
+        // ========== FUNÇÕES JSONBIN ==========
+        async function carregarPets(forcarSync = false) {
+            try {
+                const response = await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': JSONBIN_CONFIG.API_KEY },
+                    cache: forcarSync ? 'no-cache' : 'default'
+                });
+                const data = await response.json();
+                pets = data.record?.pets || [];
+                await mostrarPets();
+                atualizarHora();
+                mostrarProximaRetirada();
+                atualizarHistoricoEntregas();
+                atualizarCardsVisuais();
+                if (forcarSync) {
+                    mostrarMensagem('✅ Dados atualizados!', 'success');
+                }
+            } catch (error) {
+                console.log('Usando dados locais');
+                const local = localStorage.getItem('meusPets');
+                pets = local ? JSON.parse(local) : [];
+                await mostrarPets();
+                mostrarProximaRetirada();
+                atualizarHistoricoEntregas();
+                atualizarCardsVisuais();
+                if (forcarSync) {
+                    mostrarMensagem('⚠️ Usando dados locais', 'warning');
+                }
+            }
+        }
+
+        async function salvarPets() {
+            const dadosParaSalvar = { pets };
+            try {
+                await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosParaSalvar)
+                });
+                localStorage.setItem('meusPets', JSON.stringify(pets));
+                return true;
+            } catch (error) {
+                localStorage.setItem('meusPets', JSON.stringify(pets));
+                return false;
+            }
+        }
+
+        // ========== PRÓXIMA RETIRADA ==========
+        function mostrarProximaRetirada() {
+            const highlight = document.getElementById('nextPickupHighlight');
+            const agora = new Date();
+            const horaAtual = agora.getHours() * 60 + agora.getMinutes();
+            
+            const petsHorarioProximo = pets.filter(p => 
+                !p.arquivado && 
+                p.status !== 'Entregue' &&
+                p.horaRetirada
+            ).map(pet => {
+                const horaPet = pet.horaRetirada ? 
+                    parseInt(pet.horaRetirada.split(':')[0]) * 60 + 
+                    parseInt(pet.horaRetirada.split(':')[1]) : 0;
+                return { pet, diferenca: horaPet - horaAtual };
+            }).filter(item => item.diferenca > 0 && item.diferenca <= 120)
+              .sort((a, b) => a.diferenca - b.diferenca)
+              .map(item => item.pet);
+            
+            const petsAguardando = pets.filter(p => 
+                !p.arquivado && 
+                p.status !== 'Entregue' &&
+                (p.status === '' || p.status === 'A caminho retirada')
+            );
+            
+            const petsPrioridadeAlta = pets.filter(p => 
+                !p.arquivado && 
+                p.prioridade === 'alta' 
+            );
+            
+            const todosPetsProximaRetirada = [];
+            const idsAdicionados = new Set();
+            
+            petsHorarioProximo.forEach(pet => {
+                if (!idsAdicionados.has(pet.id)) {
+                    todosPetsProximaRetirada.push(pet);
+                    idsAdicionados.add(pet.id);
+                }
+            });
+            
+            petsPrioridadeAlta.forEach(pet => {
+                if (!idsAdicionados.has(pet.id)) {
+                    todosPetsProximaRetirada.push(pet);
+                    idsAdicionados.add(pet.id);
+                }
+            });
+            
+            petsAguardando.forEach(pet => {
+                if (!idsAdicionados.has(pet.id)) {
+                    todosPetsProximaRetirada.push(pet);
+                    idsAdicionados.add(pet.id);
+                }
+            });
+            
+            if (todosPetsProximaRetirada.length > 0 && !isAdmin) {
+                highlight.style.display = 'block';
+                
+                let html = `<div class="next-pickup-content">
+                    <div class="icon">⏰</div>
+                    <div>
+                        <h3>Próxima Retirada</h3>
+                    </div>
+                </div>
+                <div class="next-pickup-pets">`;
+                
+                todosPetsProximaRetirada.forEach(pet => {
+                    const isPrioridadeAlta = pet.prioridade === 'alta';
+                    const isAguardando = pet.status === '' || pet.status === 'A caminho retirada';
+                    
+                    html += `
+                        <div class="next-pickup-pet ${isPrioridadeAlta ? 'priority' : ''}" onclick="scrollToPet(${pet.id})">
+                            <div class="color-dot" style="background: ${isPrioridadeAlta ? '#ef4444' : '#8b5cf6'};"></div>
+                            <div class="info">
+                                <div class="name">${pet.nomePet} - ${pet.cliente}</div>
+                                <div class="details">${pet.horaRetirada || '--:--'} | ${pet.raca}</div>
+                                ${isPrioridadeAlta ? '<div class="priority-badge">⭐ Prioridade Alta</div>' : ''}
+                                ${isAguardando && !isPrioridadeAlta ? '<div class="priority-badge" style="color: #f59e0b;">⏳ Aguardando</div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                highlight.innerHTML = html;
+            } else {
+                highlight.style.display = 'none';
+            }
+        }
+
+        // ========== CARDS VISUAIS RECOLHÍVEIS ==========
+        function atualizarCardsVisuais() {
+            const visualCounters = document.getElementById('visualCounters');
+            
+            if (!isAdmin) {
+                const aguardandoRetirada = pets.filter(p => 
+                    !p.arquivado && 
+                    (p.status === '' || p.status === 'A caminho retirada')
+                );
+                
+                const emTransporte = pets.filter(p => 
+                    !p.arquivado && 
+                    (p.status === 'A caminho da loja' || p.status === 'A caminho da entrega')
+                );
+                
+                const entreguesHoje = pets.filter(p => 
+                    p.status === 'Entregue' && 
+                    !p.arquivado &&
+                    p.dataCriacao && 
+                    p.dataCriacao.startsWith(new Date().toISOString().split('T')[0])
+                );
+                
+                visualCounters.innerHTML = `
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>⏳ Aguardando Retirada (${aguardandoRetirada.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${aguardandoRetirada.length > 0 ? aguardandoRetirada.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente} - ${pet.horaRetirada || '--:--'}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet aguardando
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>🚗 Em Transporte (${emTransporte.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${emTransporte.length > 0 ? emTransporte.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente} - ${pet.status}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet em transporte
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>✅ Entregues Hoje (${entreguesHoje.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${entreguesHoje.length > 0 ? entreguesHoje.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente} - ${pet.pagamento === 'Pago' ? '✅ Pago' : '❌ Não Pago'}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet entregue hoje
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const aguardando = pets.filter(p => !p.arquivado && p.status !== 'Entregue' && 
+                    (p.status === 'A caminho retirada' || !p.status || p.status === ''));
+                
+                const emTransporte = pets.filter(p => !p.arquivado && p.status !== 'Entregue' && 
+                    (p.status === 'A caminho da loja' || p.status === 'A caminho da entrega'));
+                
+                const entregues = pets.filter(p => p.status === 'Entregue' && !p.arquivado);
+                
+                visualCounters.innerHTML = `
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>⏳ Aguardando (${aguardando.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${aguardando.length > 0 ? aguardando.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet aguardando
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>🚗 Em Transporte (${emTransporte.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${emTransporte.length > 0 ? emTransporte.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente} - ${pet.status}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet em transporte
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-counter-card" onclick="toggleCardVisual(this)">
+                        <div class="visual-counter-header">
+                            <h4>✅ Entregues (${entregues.length})</h4>
+                            <button class="visual-counter-toggle">▼</button>
+                        </div>
+                        <div class="visual-counter-content">
+                            <div class="pet-list-mini">
+                                ${entregues.length > 0 ? entregues.map(pet => `
+                                    <div class="pet-mini-item" onclick="scrollToPet(${pet.id})">
+                                        <div class="pet-mini-color" style="background: ${getPetColor(pet)}"></div>
+                                        <div class="pet-mini-info">
+                                            <strong>${pet.nomePet}</strong><br>
+                                            <small>${pet.cliente} - ${pet.pagamento === 'Pago' ? '✅ Pago' : '❌ Não Pago'}</small>
+                                        </div>
+                                    </div>
+                                `).join('') : `
+                                    <div style="text-align: center; padding: 10px; color: var(--gray-500); font-size: 12px;">
+                                        Nenhum pet entregue
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleCardVisual(card) {
+            const content = card.querySelector('.visual-counter-content');
+            const toggleBtn = card.querySelector('.visual-counter-toggle');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggleBtn.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                toggleBtn.textContent = '▲';
+            }
+        }
+
+        function getPetColor(pet) {
+            if (pet.prioridade === 'alta') return '#ef4444';
+            if (pet.prioridade === 'media') return '#f59e0b';
+            return '#6b7280';
+        }
+
+        function scrollToPet(petId) {
+            const element = document.querySelector(`[data-pet-id="${petId}"]`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.style.animation = 'pulse 1s';
+                setTimeout(() => {
+                    element.style.animation = '';
+                }, 1000);
+            }
+        }
+
+        // ========== FILTRO DE BUSCA ==========
+        function filtrarPets(termo) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!termo || termo.length < 2) {
+                searchResults.classList.remove('visible');
+                return;
+            }
+            
+            const termoLower = termo.toLowerCase();
+            const resultados = pets.filter(p => 
+                !p.arquivado && (
+                    p.cliente.toLowerCase().includes(termoLower) ||
+                    p.nomePet.toLowerCase().includes(termoLower) ||
+                    (p.raca && p.raca.toLowerCase().includes(termoLower)) ||
+                    (p.endereco && p.endereco.toLowerCase().includes(termoLower))
+                )
+            ).slice(0, 10);
+            
+            if (resultados.length === 0) {
+                searchResults.innerHTML = `
+                    <div style="padding: 10px; text-align: center; color: var(--gray-500); font-size: 12px;">
+                        Nenhum resultado encontrado
+                    </div>
+                `;
+            } else {
+                searchResults.innerHTML = resultados.map(pet => `
+                    <div class="search-result-item" onclick="scrollToPet(${pet.id})">
+                        <div style="width: 8px; height: 8px; border-radius: 50%; background: ${getPetColor(pet)}; flex-shrink: 0;"></div>
+                        <div style="flex: 1; font-size: 12px;">
+                            <div style="font-weight: 600; color: var(--gray-900);">${pet.nomePet}</div>
+                            <div style="color: var(--gray-600);">${pet.cliente} - ${pet.horaRetirada || '--:--'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            searchResults.classList.add('visible');
+        }
+
+        // ========== HISTÓRICO DE ENTREGAS ==========
+        function toggleDeliveredSidebar() {
+            const sidebar = document.getElementById('deliveredSidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function atualizarHistoricoEntregas() {
+            const deliveredList = document.getElementById('deliveredList');
+            const hoje = new Date().toISOString().split('T')[0];
+            
+            const entreguesHoje = pets.filter(p => 
+                p.status === 'Entregue' && 
+                p.dataCriacao && 
+                p.dataCriacao.startsWith(hoje)
+            );
+            
+            if (entreguesHoje.length === 0) {
+                deliveredList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray-500);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                        <p style="font-weight: 600; margin-bottom: 10px;">Nenhuma entrega hoje</p>
+                        <p style="font-size: 14px;">As entregas do dia aparecerão aqui</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            deliveredList.innerHTML = entreguesHoje.map(pet => `
+                <div class="delivered-item ${pet.pagamento === 'Pago' ? 'paid' : 'unpaid'}">
+                    <h4>${pet.nomePet}</h4>
+                    <p>${pet.cliente}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="delivered-status ${pet.pagamento === 'Pago' ? 'status-paid' : 'status-unpaid'}">
+                            ${pet.pagamento === 'Pago' ? '✅ Pago' : '❌ Não Pago'}
+                        </span>
+                        <span style="font-size: 12px; color: var(--gray-500);">
+                            ${pet.horaEntregue || '--:--'}
+                        </span>
+                    </div>
+                    ${pet.valorPix ? `
+                        <div style="margin-top: 8px; font-size: 12px; color: var(--gray-700);">
+                            💰 Valor: R$ ${parseFloat(pet.valorPix).toFixed(2).replace('.', ',')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // ========== SISTEMA PIX ==========
+        function mostrarModalPix(petId) {
+            const modal = document.getElementById('pixModal');
+            const pixValor = document.getElementById('pixValor');
+            
+            const pet = pets.find(p => p.id === petId);
+            if (pet && pet.valorPix) {
+                pixValor.textContent = parseFloat(pet.valorPix).toFixed(2).replace('.', ',');
+            } else {
+                pixValor.textContent = '50,00';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function fecharModalPix() {
+            const modal = document.getElementById('pixModal');
+            modal.classList.remove('active');
+        }
+
+        function copiarChavePix() {
+            navigator.clipboard.writeText(PIX_CONFIG.chave)
+                .then(() => mostrarMensagem('✅ Chave PIX copiada!', 'success'))
+                .catch(() => mostrarMensagem('❌ Erro ao copiar chave', 'error'));
+        }
+
+        // ========== SISTEMA DE EDIÇÃO ==========
+        function habilitarEdicao(petId) {
+            if (!isAdmin) return;
+            
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            editingPetId = petId;
+            
+            document.getElementById('cliente').value = pet.cliente;
+            document.getElementById('endereco').value = pet.endereco;
+            document.getElementById('horaRetirada').value = pet.horaRetirada;
+            document.getElementById('valorPix').value = pet.valorPix || '50.00';
+            document.getElementById('tempo').value = pet.tempo || '';
+            
+            document.getElementById('nomePet').value = pet.nomePet;
+            document.getElementById('raca').value = pet.raca;
+            document.getElementById('cor').value = pet.cor;
+            
+            resetarFormularioMultiPet();
+            
+            const form = document.getElementById('formContainer');
+            const btn = document.getElementById('addBtn');
+            const submitBtn = form.querySelector('.submit-btn');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(() => {
+                form.classList.add('active');
+                btn.textContent = '❌ Cancelar';
+                submitBtn.textContent = '💾 Salvar Alterações';
+                submitBtn.onclick = () => salvarEdicao(petId);
+            }, 300);
+        }
+
+        async function salvarEdicao(petId) {
+            if (!isAdmin) return;
+            
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            pet.cliente = document.getElementById('cliente').value.trim();
+            pet.endereco = document.getElementById('endereco').value.trim();
+            pet.horaRetirada = document.getElementById('horaRetirada').value;
+            pet.valorPix = parseFloat(document.getElementById('valorPix').value) || 50.00;
+            pet.tempo = document.getElementById('tempo').value.trim();
+            
+            pet.nomePet = document.getElementById('nomePet').value.trim();
+            pet.raca = document.getElementById('raca').value;
+            pet.cor = document.getElementById('cor').value;
+            
+            await salvarPets();
+            await mostrarPets();
+            cancelarEdicao();
+            
+            atualizarCardsVisuais();
+            
+            mostrarMensagem('✅ Pet atualizado com sucesso!', 'success');
+        }
+
+        function cancelarEdicao() {
+            editingPetId = null;
+            
+            document.getElementById('cliente').value = '';
+            document.getElementById('endereco').value = '';
+            document.getElementById('horaRetirada').value = '14:30';
+            document.getElementById('valorPix').value = '50.00';
+            document.getElementById('tempo').value = '';
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.textContent = '✨ Adicionar Transporte';
+            submitBtn.onclick = adicionarPet;
+            
+            const form = document.getElementById('formContainer');
+            const btn = document.getElementById('addBtn');
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                btn.textContent = '➕ Adicionar Pet';
+            }
+            
+            resetarFormularioMultiPet();
+        }
+
+        // ========== ADICIONAR PET COM MULTI-PETS ==========
+        async function adicionarPet() {
+            if (!isAdmin && !editingPetId) return;
+            
+            const cliente = document.getElementById('cliente').value.trim();
+            const endereco = document.getElementById('endereco').value.trim();
+            const horaRetirada = document.getElementById('horaRetirada').value || '14:30';
+            const valorPix = parseFloat(document.getElementById('valorPix').value) || 50.00;
+            const tempo = document.getElementById('tempo').value.trim() || '12 minutos';
+            
+            if (!cliente || !endereco) {
+                mostrarMensagem('⚠️ Preencha cliente e endereço!', 'warning');
+                return;
+            }
+            
+            const nomePet = document.getElementById('nomePet').value.trim();
+            const raca = document.getElementById('raca').value;
+            const cor = document.getElementById('cor').value;
+            
+            if (!nomePet || !raca || !cor) {
+                mostrarMensagem('⚠️ Preencha os dados do primeiro pet!', 'warning');
+                return;
+            }
+            
+            const petsAdicionaisColetados = [];
+            document.querySelectorAll('.multi-pet-item').forEach((item, index) => {
+                const nome = item.querySelector('.nomePetAdicional')?.value.trim();
+                const raca = item.querySelector('.racaAdicional')?.value;
+                const cor = item.querySelector('.corAdicional')?.value;
+                
+                if (nome && raca && cor) {
+                    petsAdicionaisColetados.push({ nomePet: nome, raca, cor });
+                }
+            });
+            
+            const todosPets = [
+                { nomePet, raca, cor },
+                ...petsAdicionaisColetados
+            ];
+            
+            if (todosPets.length === 0) {
+                mostrarMensagem('⚠️ Adicione pelo menos um pet!', 'warning');
+                return;
+            }
+            
+            if (todosPets.length > 5) {
+                mostrarMensagem('⚠️ Máximo de 5 pets por cliente!', 'warning');
+                return;
+            }
+            
+            if (editingPetId) {
+                const pet = pets.find(p => p.id === editingPetId);
+                if (pet) {
+                    pet.cliente = cliente;
+                    pet.endereco = endereco;
+                    pet.horaRetirada = horaRetirada;
+                    pet.valorPix = valorPix;
+                    pet.tempo = tempo;
+                    pet.nomePet = nomePet;
+                    pet.raca = raca;
+                    pet.cor = cor;
+                    pet.petsAdicionais = petsAdicionaisColetados;
+                }
+            } else {
+                const clienteId = Date.now();
+                
+                todosPets.forEach((petData, index) => {
+                    const pet = {
+                        id: clienteId + index,
+                        clienteId: clienteId,
+                        cliente: cliente,
+                        nomePet: petData.nomePet,
+                        raca: petData.raca,
+                        cor: petData.cor,
+                        endereco: endereco,
+                        tempo: tempo,
+                        horaRetirada: horaRetirada,
+                        valorPix: valorPix,
+                        status: '',
+                        pagamento: 'Pendente',
+                        observacoesAdmin: '',
+                        observacoesMotorista: '',
+                        horaEntregue: null,
+                        valorRecebido: null,
+                        dataPagamento: null,
+                        dataCriacao: new Date().toISOString(),
+                        arquivado: false,
+                        pagamentoCollapsed: true,
+                        prioridade: null,
+                        petsAdicionais: index === 0 ? petsAdicionaisColetados : []
+                    };
+                    
+                    pets.push(pet);
+                });
+            }
+            
+            await salvarPets();
+            await mostrarPets();
+            mostrarProximaRetirada();
+            atualizarHistoricoEntregas();
+            atualizarCardsVisuais();
+            
+            cancelarEdicao();
+            
+            mostrarMensagem(`✅ ${todosPets.length} pet(s) adicionado(s) com sucesso!`, 'success');
+        }
+
+        // ========== ATUALIZAR STATUS DO PET ==========
+        async function atualizarPetStatus(petId, campo, valor) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            const valorAnterior = pet[campo];
+            pet[campo] = valor;
+            
+            if (campo === 'status' && valor === 'Entregue' && valorAnterior !== 'Entregue') {
+                const agora = new Date();
+                pet.horaEntregue = agora.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                
+                pet.pagamentoCollapsed = false;
+                
+                if (pet.pagamento === 'Pago') {
+                    pet.arquivado = true;
+                    mostrarMensagem('✅ Entregue! Como já estava marcado como Pago, pet foi arquivado.', 'success');
+                } else {
+                    mostrarMensagem('✅ Pet marcado como entregue!', 'success');
+                }
+            }
+            
+            if (campo === 'pagamento') {
+                if (pet.status !== 'Entregue') {
+                    mostrarMensagem('⚠️ Marque como "Entregue" antes de definir o pagamento!', 'warning');
+                    pet[campo] = valorAnterior;
+                    return;
+                }
+                
+                if (valor === 'Pago' || valor === 'Não pago') {
+                    pet.arquivado = true;
+                    mostrarMensagem(`✅ ${valor} - Pet arquivado!`, 'success');
+                }
+            }
+            
+            await salvarPets();
+            
+            if (campo === 'status' && valor !== 'Entregue') {
+                const container = document.getElementById('petsList');
+                const cards = container.querySelectorAll('.pet-card');
+                
+                cards.forEach(card => {
+                    card.classList.add('smooth-move');
+                });
+                
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                const petsOrdenados = aplicarOrdenacaoDinamicaCorrigida();
+                await mostrarPetsComOrdem(petsOrdenados);
+                
+                setTimeout(() => {
+                    cards.forEach(card => {
+                        card.classList.remove('smooth-move');
+                    });
+                }, 600);
+            } else {
+                await mostrarPets();
+            }
+            
+            mostrarProximaRetirada();
+            atualizarHistoricoEntregas();
+            atualizarCardsVisuais();
+        }
+
+        // ========== FUNÇÕES DE PRIORIDADE ==========
+        function definirPrioridade(petId, prioridade) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            pet.prioridade = prioridade;
+            salvarPets();
+            mostrarPets();
+            mostrarProximaRetirada();
+            
+            mostrarMensagem(`✅ Prioridade definida como ${prioridade}!`, 'success');
+        }
+
+        async function atualizarObservacoes(petId, tipo, texto) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            if (tipo === 'admin') {
+                pet.observacoesAdmin = texto;
+            } else {
+                pet.observacoesMotorista = texto;
+            }
+            
+            await salvarPets();
+            
+            mostrarMensagem('✅ Observação salva!', 'success');
+        }
+
+        // ========== ADMIN MARCAR COMO PAGO ==========
+        async function adminMarcarComoPago(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            if (!confirm(`Marcar ${pet.nomePet} como PAGO? ${pet.status === 'Entregue' ? 'O pet será arquivado.' : 'O motorista ainda precisa marcar como Entregue.'}`)) return;
+            
+            pet.pagamento = 'Pago';
+            pet.dataPagamento = new Date().toISOString();
+            
+            if (!pet.valorRecebido) {
+                pet.valorRecebido = pet.valorPix || 50.00;
+            }
+            
+            if (pet.status === 'Entregue') {
+                pet.arquivado = true;
+                mostrarMensagem(`✅ ${pet.nomePet} marcado como PAGO e arquivado!`, 'success');
+            } else {
+                mostrarMensagem(`✅ ${pet.nomePet} marcado como PAGO! Motorista ainda precisa marcar como Entregue.`, 'success');
+            }
+            
+            await salvarPets();
+            await mostrarPets();
+            atualizarCardsVisuais();
+        }
+
+        async function removerPet(petId) {
+            if (!isAdmin || !confirm('Remover este pet?')) return;
+            
+            pets = pets.filter(p => p.id !== petId);
+            await salvarPets();
+            await mostrarPets();
+            mostrarProximaRetirada();
+            atualizarHistoricoEntregas();
+            atualizarCardsVisuais();
+            
+            mostrarMensagem('✅ Pet removido!', 'success');
+        }
+
+        function copiarEndereco(endereco) {
+            navigator.clipboard.writeText(endereco)
+                .then(() => mostrarMensagem('📍 Endereço copiado!', 'success'))
+                .catch(() => mostrarMensagem('❌ Erro ao copiar', 'error'));
+        }
+
+        // ========== ZERAR PETS ENTREGUES ==========
+        async function zerarPetsEntregues() {
+            if (!isAdmin) return;
+            
+            const petsEntregues = pets.filter(p => p.status === 'Entregue' && !p.arquivado);
+            
+            if (petsEntregues.length === 0) {
+                mostrarMensagem('ℹ️ Nenhum pet entregue para zerar!', 'info');
+                return;
+            }
+            
+            if (!confirm(`Deseja arquivar ${petsEntregues.length} pet(s) entregue(s)?\n\nEsta ação marcará todos como arquivados e eles não aparecerão mais na lista.`)) {
+                return;
+            }
+            
+            pets.forEach(pet => {
+                if (pet.status === 'Entregue' && !pet.arquivado) {
+                    pet.arquivado = true;
+                }
+            });
+            
+            await salvarPets();
+            await mostrarPets();
+            atualizarCardsVisuais();
+            
+            mostrarMensagem(`✅ ${petsEntregues.length} pet(s) entregue(s) arquivados com sucesso!`, 'success');
+        }
+
+        // ========== LIMPAR BANCO DE DADOS ==========
+        function mostrarModalLimpeza() {
+            if (!isAdmin) return;
+            
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmPassword').value = '';
+            modal.classList.add('active');
+        }
+
+        function fecharModalConfirm() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('active');
+        }
+
+        async function confirmarLimpeza() {
+            const password = document.getElementById('confirmPassword').value;
+            
+            if (password !== 'admin123') {
+                mostrarMensagem('❌ Senha incorreta!', 'error');
+                return;
+            }
+            
+            if (!confirm('⚠️ ATENÇÃO: Esta ação irá APAGAR TODOS OS PETS permanentemente! Tem certeza?')) {
+                return;
+            }
+            
+            pets = [];
+            
+            try {
+                await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pets: [] })
+                });
+            } catch (error) {
+                console.error('Erro ao limpar JSONBin:', error);
+            }
+            
+            localStorage.removeItem('meusPets');
+            
+            fecharModalConfirm();
+            await mostrarPets();
+            atualizarCardsVisuais();
+            mostrarProximaRetirada();
+            atualizarHistoricoEntregas();
+            
+            mostrarMensagem('✅ Banco de dados limpo com sucesso!', 'success');
+        }
+
+        // ========== RENDERIZAR PETS ==========
+        async function mostrarPets() {
+            const container = document.getElementById('petsList');
+            
+            let petsVisiveis = pets.filter(p => !p.arquivado);
+            
+            const petsOrdenados = aplicarOrdenacaoDinamicaCorrigida();
+            petsVisiveis = petsOrdenados.filter(p => 
+                petsVisiveis.some(pet => pet.id === p.id)
+            );
+            
+            if (petsVisiveis.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>${isAdmin ? '📋 Nenhum pet ativo' : '📭 Nenhum pet para transporte'}</p>
+                        <p>${isAdmin ? 'Adicione um pet!' : 'Aguardando novos pets'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const petsAgrupados = {};
+            petsVisiveis.forEach(pet => {
+                if (!petsAgrupados[pet.clienteId]) {
+                    petsAgrupados[pet.clienteId] = [];
+                }
+                petsAgrupados[pet.clienteId].push(pet);
+            });
+
+            container.innerHTML = Object.values(petsAgrupados).map((grupo, index) => {
+                const petPrincipal = grupo[0];
+                const outrosPets = grupo.slice(1);
+                
+                const isEntregue = petPrincipal.status === 'Entregue';
+                const petColor = getPetColor(petPrincipal);
+                
+                return `
+                <div class="pet-card" data-pet-id="${petPrincipal.id}" style="border-left-color: ${petColor};">
+                    
+                    <div class="pet-card-header">
+                        <div class="pet-name-section">
+                            <h3>${petPrincipal.nomePet}${outrosPets.length > 0 ? ` +${outrosPets.length}` : ''}</h3>
+                            <p>${petPrincipal.cliente}</p>
+                            <div class="badge-container">
+                                ${isAdmin ? `
+                                    ${petPrincipal.status ? `<span class="badge-status ${petPrincipal.status.replace(/ /g, '-').toLowerCase()}">
+                                        ${petPrincipal.status}
+                                    </span>` : ''}
+                                    <span class="badge-status ${petPrincipal.pagamento === 'Pago' ? 'pago' : petPrincipal.pagamento === 'Não pago' ? 'nao-pago' : ''}">
+                                        ${petPrincipal.pagamento}
+                                    </span>
+                                    ${petPrincipal.prioridade ? `<span class="badge-status" style="background: ${petPrincipal.prioridade === 'alta' ? '#ef4444' : '#f59e0b'}; color: white;">
+                                        ${petPrincipal.prioridade === 'alta' ? '⭐ Alta' : '🟡 Média'}
+                                    </span>` : ''}
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="pet-details-right">
+                            <div class="pet-time">
+                                <span>⏰ <strong>Retirada:</strong> ${petPrincipal.horaRetirada || '--:--'}</span>
+                            </div>
+                            ${isEntregue ? `
+                                <div class="hora-entregue">
+                                    <span>✅ <strong>Entregue:</strong> ${petPrincipal.horaEntregue || '--:--'}</span>
+                                </div>
+                            ` : ''}
+                            ${isAdmin ? `
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                                    <div class="priority-buttons">
+                                        <button class="priority-btn alta ${petPrincipal.prioridade === 'alta' ? 'active' : ''}" 
+                                                onclick="definirPrioridade(${petPrincipal.id}, 'alta')"
+                                                title="Prioridade Alta">
+                                            ⭐ Alta
+                                        </button>
+                                        <button class="priority-btn media ${petPrincipal.prioridade === 'media' ? 'active' : ''}" 
+                                                onclick="definirPrioridade(${petPrincipal.id}, 'media')"
+                                                title="Prioridade Média">
+                                            🟡 Média
+                                        </button>
+                                    </div>
+                                    <button class="admin-pagamento-btn" onclick="adminMarcarComoPago(${petPrincipal.id})">
+                                        💰 Pago
+                                    </button>
+                                </div>
+                            ` : ''}
+                            <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                                ${!isAdmin && !isEntregue ? `
+                                    <button class="pix-btn" onclick="mostrarModalPix(${petPrincipal.id})" title="Mostrar QR Code PIX">
+                                        💰
+                                    </button>
+                                ` : ''}
+                                ${isAdmin ? `
+                                    <button class="edit-btn visible" onclick="habilitarEdicao(${petPrincipal.id})">
+                                        ✏️ Editar
+                                    </button>
+                                    <button class="delete-btn visible" onclick="removerPet(${petPrincipal.id})">
+                                        🗑️ Remover
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${outrosPets.length > 0 ? `
+                        <div class="multi-pets-display">
+                            ${outrosPets.map((pet, idx) => `
+                                <div class="pet-tag">
+                                    <div class="pet-tag-color" style="background: ${getPetColor(pet)}"></div>
+                                    <span>${pet.nomePet} (${pet.raca})</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="pet-info">
+                        <div class="pet-info-item">
+                            <strong>🐕 Raça:</strong> ${petPrincipal.raca}
+                        </div>
+                        <div class="pet-info-item">
+                            <strong>🎨 Cor:</strong> ${petPrincipal.cor}
+                        </div>
+                        <div class="pet-info-item">
+                            <strong>⏱️ Tempo:</strong> ${petPrincipal.tempo}
+                        </div>
+                        ${petPrincipal.valorPix ? `
+                            <div class="pet-info-item">
+                                <strong>💰 Valor:</strong> R$ ${parseFloat(petPrincipal.valorPix).toFixed(2).replace('.', ',')}
+                            </div>
+                        ` : ''}
+                        ${petPrincipal.prioridade ? `
+                            <div class="pet-info-item">
+                                <strong>🎯 Prioridade:</strong> 
+                                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: ${petColor}; margin-left: 5px;"></span>
+                                ${petPrincipal.prioridade === 'alta' ? 'Alta' : 'Média'}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="pet-address">
+                        <p>📍 <strong>Endereço:</strong> ${petPrincipal.endereco}</p>
+                        ${!isAdmin ? `
+                            <button class="copy-address-btn" onclick="copiarEndereco('${petPrincipal.endereco.replace(/'/g, "\\'")}')">
+                                📋 Copiar Endereço
+                            </button>
+                        ` : ''}
+                    </div>
+                    
+                    ${!isAdmin && isEntregue && !petPrincipal.valorRecebido && petPrincipal.pagamento !== 'Pago' ? `
+                        <div class="valor-recebido-section" id="valorRecebido-${petPrincipal.id}">
+                            <div class="valor-recebido-label">
+                                💰 Valor Recebido (PIX)
+                            </div>
+                            <div class="valor-input-container">
+                                <input type="text" 
+                                       class="valor-input" 
+                                       placeholder="R$ 0,00"
+                                       onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 44 || event.charCode === 46"
+                                       onblur="formatarValor(this)">
+                                <button class="confirmar-valor-btn" onclick="confirmarValorRecebido(${petPrincipal.id})">
+                                    ✅ Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${petPrincipal.valorRecebido && isAdmin ? `
+                        <div style="margin-top: 15px; padding: 12px; background: #f0fdf4; border-radius: 10px; border: 2px solid #86efac;">
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--success-dark); font-weight: 600;">
+                                💰 Valor recebido: R$ ${parseFloat(petPrincipal.valorRecebido).toFixed(2).replace('.', ',')}
+                                ${petPrincipal.dataPagamento ? `<span style="font-size: 12px; color: var(--gray-500);">(${new Date(petPrincipal.dataPagamento).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})})</span>` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="status-section">
+                        ${!isAdmin ? `
+                            <div class="status-buttons">
+                                ${['A caminho retirada', 'A caminho da loja', 'A caminho da entrega', 'Entregue'].map(status => `
+                                    <button class="status-btn ${petPrincipal.status === status ? 'active' : ''}" 
+                                            onclick="atualizarPetStatus(${petPrincipal.id}, 'status', '${status}')"
+                                            ${petPrincipal.arquivado ? 'disabled' : ''}>
+                                        ${status}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            
+                            <button class="toggle-pagamento-btn ${petPrincipal.pagamentoCollapsed ? 'collapsed' : ''}" 
+                                    onclick="togglePagamento(${petPrincipal.id})"
+                                    ${petPrincipal.status !== 'Entregue' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="arrow">▼</span>
+                                    <span>💰 Pagamento</span>
+                                </div>
+                                
+                                <span class="payment-status-badge ${petPrincipal.pagamento === 'Pago' ? 'pago' : petPrincipal.pagamento === 'Não pago' ? 'nao-pago' : 'pendente'}">
+                                    ${petPrincipal.pagamento === 'Pago' ? '✅ Pago' : petPrincipal.pagamento === 'Não pago' ? '❌ Não Pago' : '⏳ Pendente'}
+                                </span>
+                            </button>
+
+                            <div class="pagamento-section ${petPrincipal.pagamentoCollapsed ? 'collapsed' : ''}">
+                                <div class="pagamento-buttons">
+                                    <button class="pagamento-btn pago ${petPrincipal.pagamento === 'Pago' ? 'active' : ''}" 
+                                            onclick="marcarComoPago(${petPrincipal.id})"
+                                            ${petPrincipal.status !== 'Entregue' ? 'disabled' : ''}>
+                                        ✅ Marcar como Pago
+                                    </button>
+                                    <button class="pagamento-btn nao-pago ${petPrincipal.pagamento === 'Não pago' ? 'active' : ''}" 
+                                            onclick="marcarComoNaoPago(${petPrincipal.id})"
+                                            ${petPrincipal.status !== 'Entregue' ? 'disabled' : ''}>
+                                        ❌ Marcar como Não Pago
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="observacoes-container">
+                            ${isAdmin ? `
+                                <div>
+                                    <span class="observacoes-label">📝 Minhas Observações (Admin):</span>
+                                    <textarea class="observacoes observacoes-admin" 
+                                              onchange="atualizarObservacoes(${petPrincipal.id}, 'admin', this.value)"
+                                              onblur="atualizarObservacoes(${petPrincipal.id}, 'admin', this.value)"
+                                              placeholder="Digite observações administrativas...">${petPrincipal.observacoesAdmin || ''}</textarea>
+                                    
+                                    <span class="observacoes-label">📝 Observações do Motorista:</span>
+                                    <textarea class="observacoes observacoes-motorista observacoes-readonly" 
+                                              readonly
+                                              placeholder="Observações do motorista...">${petPrincipal.observacoesMotorista || ''}</textarea>
+                                </div>
+                            ` : `
+                                <div>
+                                    <span class="observacoes-label">📝 Observações do Admin:</span>
+                                    <textarea class="observacoes observacoes-admin observacoes-readonly" 
+                                              readonly
+                                              placeholder="Observações do admin...">${petPrincipal.observacoesAdmin || ''}</textarea>
+                                    
+                                    <span class="observacoes-label">📝 Minhas Observações:</span>
+                                    <textarea class="observacoes observacoes-motorista" 
+                                              onchange="atualizarObservacoes(${petPrincipal.id}, 'motorista', this.value)"
+                                              onblur="atualizarObservacoes(${petPrincipal.id}, 'motorista', this.value)"
+                                              placeholder="Digite suas observações...">${petPrincipal.observacoesMotorista || ''}</textarea>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            
+            atualizarHora();
+        }
+
+        // ========== UTILITÁRIOS ==========
+        function formatarValor(input) {
+            let valor = input.value.replace(/\D/g, '');
+            valor = (parseInt(valor) / 100).toFixed(2);
+            input.value = valor.replace('.', ',');
+        }
+
+        function mostrarMensagem(texto, tipo) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : tipo === 'info' ? '#3b82f6' : '#f59e0b'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 10px;
+                box-shadow: var(--shadow-lg);
+                z-index: 10000;
+                animation: slideInLeft 0.3s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : tipo === 'info' ? 'ℹ️' : '⚠️'}</span>
+                <span>${texto}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function atualizarHora() {
+            const agora = new Date();
+            const horaFormatada = agora.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            document.getElementById('lastUpdate').textContent = horaFormatada;
+        }
+
+        function togglePagamento(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            if (pet.status !== 'Entregue') {
+                mostrarMensagem('⚠️ Marque como "Entregue" primeiro!', 'warning');
+                return;
+            }
+            
+            pet.pagamentoCollapsed = !pet.pagamentoCollapsed;
+            salvarPets();
+            mostrarPets();
+        }
+
+        async function marcarComoPago(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            if (pet.status !== 'Entregue') {
+                mostrarMensagem('⚠️ Marque como "Entregue" primeiro!', 'warning');
+                return;
+            }
+            
+            if (!confirm(`Marcar ${pet.nomePet} como PAGO? O pet será arquivado.`)) return;
+            
+            pet.pagamento = 'Pago';
+            pet.arquivado = true;
+            pet.dataPagamento = new Date().toISOString();
+            
+            if (pet.status === 'Entregue' && !pet.valorRecebido) {
+                pet.valorRecebido = pet.valorPix || 50.00;
+            }
+            
+            await salvarPets();
+            mostrarPets();
+            mostrarMensagem(`✅ ${pet.nomePet} marcado como PAGO e arquivado!`, 'success');
+        }
+
+        async function marcarComoNaoPago(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            if (pet.status !== 'Entregue') {
+                mostrarMensagem('⚠️ Marque como "Entregue" primeiro!', 'warning');
+                return;
+            }
+            
+            if (!confirm(`Marcar ${pet.nomePet} como NÃO PAGO? O pet será arquivado.`)) return;
+            
+            pet.pagamento = 'Não pago';
+            pet.arquivado = true;
+            pet.dataPagamento = new Date().toISOString();
+            
+            await salvarPets();
+            mostrarPets();
+            mostrarMensagem(`❌ ${pet.nomePet} marcado como NÃO PAGO e arquivado!`, 'warning');
+        }
+
+        // ========== INICIAR ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa o sistema de licenciamento
+            const warningContainer = document.createElement('div');
+            warningContainer.id = 'license-warning';
+            document.body.appendChild(warningContainer);
+            
+            window.licenseValidator = new LicenseValidator();
+            
+            // Verifica se tem licença válida
+            const hasLicense = verificarLicencaInicial();
+            
+            if (hasLicense) {
+                // Tem licença, carrega normalmente
+                configurarInterface();
+                carregarPets();
+                
+                // Configura eventos
+                document.getElementById('pixModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'pixModal') {
+                        fecharModalPix();
+                    }
+                });
+                
+                document.getElementById('confirmModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'confirmModal') {
+                        fecharModalConfirm();
+                    }
+                });
+                
+                setInterval(() => carregarPets(false), 15000);
+                
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') {
+                        carregarPets(false);
+                    }
+                });
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideInLeft {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    
+                    @keyframes slideOutRight {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                    }
+                    
+                    @keyframes pulse {
+                        0%, 100% { box-shadow: var(--shadow-lg); }
+                        50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+                    }
+                `;
+                document.head.appendChild(style);
+            } else {
+                // Não tem licença, aguarda ativação
+                console.log('⏳ Aguardando ativação da licença...');
+            }
+        });
+
+        async function mostrarPetsComOrdem(petsOrdenados) {
+            await mostrarPets();
+        }
+    </script>
+</body>
+</html>
