@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐾 Pet Shop Transport</title>
     
-    <!-- SISTEMA DE LICENCIAMENTO -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- SISTEMA DE LICENCIAMENTO - SUPABASE SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         // Configuração do sistema de licenciamento
-        const LICENSE_CONFIG = {
+        window.LICENSE_CONFIG = {
             TEST_KEY: "PST-WVVI-UK1U-X7YO",
             SUPABASE_URL: "https://awirsiozohdgmmplugcl.supabase.co",
             SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc"
@@ -91,11 +91,15 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 99999 !important;
+            z-index: 99999;
             padding: 20px;
+        }
+        
+        #license-screen.active {
+            display: flex;
         }
         
         .license-container {
@@ -353,11 +357,8 @@
         }
         
         /* Esconder conteúdo principal quando tela de licença está ativa */
-        body:has(#license-screen:not([style*="display: none"])) .container {
-            display: none !important;
-        }
-        
-        body:has(#license-screen:not([style*="display: none"])) .history-btn {
+        .license-active .container,
+        .license-active .history-btn {
             display: none !important;
         }
         
@@ -2447,8 +2448,72 @@
     </style>
 </head>
 <body>
-    <!-- TELA DE ATIVAÇÃO DE LICENÇA (SERÁ INJETADA VIA JAVASCRIPT) -->
-    
+    <!-- TELA DE ATIVAÇÃO DE LICENÇA -->
+    <div id="license-screen">
+        <div class="license-container">
+            <div class="license-card">
+                <div class="license-header">
+                    <h1>🚀 Pet Shop Transport</h1>
+                    <h2>Ativação do Sistema</h2>
+                </div>
+                
+                <div class="license-body">
+                    <div class="license-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    
+                    <p class="license-info">
+                        Para usar o Pet Shop Transport, é necessário uma licença válida.
+                    </p>
+                    
+                    <div class="license-input-group">
+                        <input 
+                            type="text" 
+                            id="license-key-input" 
+                            placeholder="Digite sua chave (ex: PST-XXXX-XXXX-XXXX)"
+                            class="license-input"
+                            value="PST-WVVI-UK1U-X7YO"
+                        >
+                        <button id="activate-license-btn" class="license-button">
+                            ✅ Ativar Licença
+                        </button>
+                    </div>
+                    
+                    <div id="activation-status" class="license-status">
+                        <!-- Mensagens de status aparecerão aqui -->
+                    </div>
+                    
+                    <div class="license-features">
+                        <h3>✨ Recursos Incluídos:</h3>
+                        <ul>
+                            <li>✅ Gestão completa de transporte de pets</li>
+                            <li>✅ Sistema PIX integrado</li>
+                            <li>✅ Modos Admin e Motorista</li>
+                            <li>✅ Sincronização em nuvem</li>
+                            <li>✅ Suporte prioritário</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="license-support">
+                        <h3>🆘 Precisa de ajuda?</h3>
+                        <p>
+                            <strong>Chave de Teste:</strong> PST-WVVI-UK1U-X7YO<br>
+                            <strong>Suporte:</strong> suporte@petshoptransport.com<br>
+                            <strong>Telefone:</strong> (11) 99999-9999
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="license-footer">
+                    <p>Pet Shop Transport © <span id="current-year">2024</span> - Sistema de Licenciamento</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PIX -->
     <div class="modal-overlay" id="pixModal">
         <div class="modal-pix">
@@ -2691,78 +2756,103 @@
             qrcodeBackup: 'https://imgur.com/paZK1Tx'
         };
 
-        // ========== SISTEMA DE LICENCIAMENTO ==========
-        class LicenseValidator {
+        // ========== SISTEMA DE LICENCIAMENTO SIMPLIFICADO ==========
+        class SimpleLicenseValidator {
             constructor() {
-                this.supabaseUrl = LICENSE_CONFIG.SUPABASE_URL;
-                this.supabaseKey = LICENSE_CONFIG.SUPABASE_KEY;
+                this.supabaseUrl = window.LICENSE_CONFIG.SUPABASE_URL;
+                this.supabaseKey = window.LICENSE_CONFIG.SUPABASE_KEY;
                 this.supabase = null;
-                this.licenseData = null;
-                this.initSupabase();
-                this.initLicenseCheck();
+                this.initialized = false;
+                this.init();
             }
 
-            initSupabase() {
+            async init() {
                 try {
-                    this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
-                    console.log('✅ Cliente Supabase inicializado');
+                    // Usando a variável global do Supabase do CDN
+                    this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    this.initialized = true;
+                    console.log('✅ Supabase inicializado com sucesso');
                 } catch (error) {
                     console.error('❌ Erro ao inicializar Supabase:', error);
                 }
             }
 
             getLocalLicense() {
-                return {
-                    key: localStorage.getItem('pst_license_key'),
-                    clienteId: localStorage.getItem('pst_cliente_id'),
-                    clienteNome: localStorage.getItem('pst_cliente_nome'),
-                    validade: localStorage.getItem('pst_validade'),
-                    plano: localStorage.getItem('pst_plano')
-                };
+                try {
+                    return {
+                        key: localStorage.getItem('pst_license_key'),
+                        clienteId: localStorage.getItem('pst_cliente_id'),
+                        clienteNome: localStorage.getItem('pst_cliente_nome') || 'Cliente Pet Shop',
+                        validade: localStorage.getItem('pst_validade'),
+                        plano: localStorage.getItem('pst_plano') || 'basico'
+                    };
+                } catch (error) {
+                    console.error('Erro ao ler licença local:', error);
+                    return {};
+                }
             }
 
-            saveLocalLicense(licenseData) {
-                if (licenseData) {
-                    localStorage.setItem('pst_license_key', licenseData.chave || '');
-                    localStorage.setItem('pst_cliente_id', licenseData.cliente_id || '');
-                    localStorage.setItem('pst_cliente_nome', licenseData.cliente_nome || 'Cliente Pet Shop');
-                    localStorage.setItem('pst_validade', licenseData.data_vencimento || '');
-                    localStorage.setItem('pst_plano', licenseData.plano || 'basico');
+            saveLocalLicense(data) {
+                try {
+                    if (data.chave) localStorage.setItem('pst_license_key', data.chave);
+                    if (data.cliente_id) localStorage.setItem('pst_cliente_id', data.cliente_id);
+                    localStorage.setItem('pst_cliente_nome', data.cliente_nome || 'Cliente Pet Shop');
+                    localStorage.setItem('pst_validade', data.data_vencimento || '');
+                    localStorage.setItem('pst_plano', data.plano || 'basico');
                     localStorage.setItem('pst_last_validation', new Date().toISOString());
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar licença:', error);
+                    return false;
                 }
             }
 
             clearLocalLicense() {
-                localStorage.removeItem('pst_license_key');
-                localStorage.removeItem('pst_cliente_id');
-                localStorage.removeItem('pst_cliente_nome');
-                localStorage.removeItem('pst_validade');
-                localStorage.removeItem('pst_plano');
-                localStorage.removeItem('pst_last_validation');
+                try {
+                    localStorage.removeItem('pst_license_key');
+                    localStorage.removeItem('pst_cliente_id');
+                    localStorage.removeItem('pst_cliente_nome');
+                    localStorage.removeItem('pst_validade');
+                    localStorage.removeItem('pst_plano');
+                    localStorage.removeItem('pst_last_validation');
+                } catch (error) {
+                    console.error('Erro ao limpar licença:', error);
+                }
             }
 
             async validateLicense(licenseKey) {
-                try {
-                    console.log(`🔍 Validando licença: ${licenseKey}`);
-                    
-                    const { data: license, error: licenseError } = await this.supabase
-                        .from('licencas')
-                        .select('*, clientes(*)')
-                        .eq('chave', licenseKey)
-                        .single();
+                if (!this.initialized || !this.supabase) {
+                    return {
+                        valid: false,
+                        message: 'Sistema não inicializado',
+                        error: 'Supabase não disponível'
+                    };
+                }
 
-                    if (licenseError || !license) {
+                try {
+                    console.log('🔍 Validando licença:', licenseKey);
+                    
+                    // Busca direta na tabela licencas
+                    const { data: license, error } = await this.supabase
+                        .from('licencas')
+                        .select('*')
+                        .eq('chave', licenseKey)
+                        .maybeSingle();
+
+                    if (error || !license) {
+                        console.log('Licença não encontrada:', error);
                         return {
                             valid: false,
                             message: 'Licença não encontrada',
-                            error: licenseError
+                            error: error?.message
                         };
                     }
 
-                    const expirationDate = new Date(license.data_vencimento);
+                    // Verifica vencimento
                     const now = new Date();
+                    const expiration = new Date(license.data_vencimento);
                     
-                    if (expirationDate < now) {
+                    if (expiration < now) {
                         return {
                             valid: false,
                             message: 'Licença vencida',
@@ -2770,27 +2860,27 @@
                         };
                     }
 
-                    if (!license.data_ativacao) {
-                        return {
-                            valid: false,
-                            message: 'Licença não ativada',
-                            licenseData: license
-                        };
-                    }
-
-                    if (!license.clientes) {
-                        return {
-                            valid: false,
-                            message: 'Cliente não encontrado',
-                            licenseData: license
-                        };
+                    // Busca cliente associado
+                    let clienteNome = 'Cliente Pet Shop';
+                    let plano = 'basico';
+                    
+                    if (license.cliente_id) {
+                        const { data: cliente } = await this.supabase
+                            .from('clientes')
+                            .select('nome, plano')
+                            .eq('id', license.cliente_id)
+                            .maybeSingle();
+                        
+                        if (cliente) {
+                            clienteNome = cliente.nome || 'Cliente Pet Shop';
+                            plano = cliente.plano || 'basico';
+                        }
                     }
 
                     const licenseData = {
                         ...license,
-                        cliente_nome: license.clientes.nome || license.clientes.cnpj || 'Cliente Pet Shop',
-                        plano: license.clientes.plano || 'basico',
-                        dominio: license.clientes.dominio || ''
+                        cliente_nome: clienteNome,
+                        plano: plano
                     };
 
                     this.saveLocalLicense(licenseData);
@@ -2802,7 +2892,7 @@
                     };
 
                 } catch (error) {
-                    console.error('❌ Erro na validação:', error);
+                    console.error('Erro na validação:', error);
                     return {
                         valid: false,
                         message: 'Erro na validação',
@@ -2811,93 +2901,48 @@
                 }
             }
 
-            async activateLicense(licenseKey) {
-                try {
-                    const validation = await this.validateLicense(licenseKey);
-                    
-                    if (validation.valid) {
-                        const { data: license } = await this.supabase
-                            .from('licencas')
-                            .select('data_ativacao')
-                            .eq('chave', licenseKey)
-                            .single();
-
-                        if (!license.data_ativacao) {
-                            await this.supabase
-                                .from('licencas')
-                                .update({ data_ativacao: new Date().toISOString() })
-                                .eq('chave', licenseKey);
-                        }
-
-                        return validation;
-                    }
-                    
-                    return validation;
-                    
-                } catch (error) {
-                    return {
-                        valid: false,
-                        message: 'Erro na ativação',
-                        error: error.message
-                    };
-                }
-            }
-
-            startPeriodicCheck(intervalMinutes = 5) {
-                setInterval(() => {
-                    this.checkLicenseValidity();
-                }, intervalMinutes * 60 * 1000);
-            }
-
-            async checkLicenseValidity() {
-                const localLicense = this.getLocalLicense();
-                
-                if (!localLicense.key) {
-                    return { valid: false, message: 'Nenhuma licença encontrada' };
-                }
-
-                try {
-                    const validation = await this.validateLicense(localLicense.key);
-                    
-                    if (!validation.valid) {
-                        this.clearLocalLicense();
-                        this.showLicenseScreen();
-                    } else {
-                        const expirationDate = new Date(validation.licenseData.data_vencimento);
-                        const now = new Date();
-                        const daysUntilExpiration = Math.ceil((expirationDate - now) / (1000 * 60 * 60 * 24));
-                        
-                        if (daysUntilExpiration <= 3 && daysUntilExpiration > 0) {
-                            this.showExpirationWarning(daysUntilExpiration);
-                        }
-                    }
-                    
-                    return validation;
-                    
-                } catch (error) {
-                    return this.checkLocalValidity();
-                }
-            }
-
             checkLocalValidity() {
-                const localLicense = this.getLocalLicense();
+                const local = this.getLocalLicense();
                 
-                if (!localLicense.key || !localLicense.validade) {
+                if (!local.key || !local.validade) {
                     return { valid: false, message: 'Licença não encontrada' };
                 }
 
-                const expirationDate = new Date(localLicense.validade);
                 const now = new Date();
+                const expiration = new Date(local.validade);
                 
-                if (expirationDate < now) {
+                if (expiration < now) {
                     return { valid: false, message: 'Licença vencida (offline)' };
                 }
 
                 return {
                     valid: true,
                     message: 'Licença válida (offline)',
-                    licenseData: localLicense
+                    licenseData: local
                 };
+            }
+
+            addLicenseIndicator(licenseData) {
+                const header = document.querySelector('.header');
+                if (!header) return;
+
+                // Remove indicador anterior
+                const oldIndicator = document.getElementById('license-indicator');
+                if (oldIndicator) oldIndicator.remove();
+
+                const indicator = document.createElement('div');
+                indicator.id = 'license-indicator';
+                indicator.className = 'license-indicator';
+                indicator.innerHTML = `
+                    <span title="Licença ${licenseData.plano} - Válida até ${new Date(licenseData.validade || licenseData.data_vencimento).toLocaleDateString('pt-BR')}">
+                        ✅ ${licenseData.cliente_nome || licenseData.clienteNome || 'Cliente'}
+                    </span>
+                `;
+                
+                const userBadge = document.querySelector('.user-badge');
+                if (userBadge && userBadge.parentNode) {
+                    userBadge.parentNode.insertBefore(indicator, userBadge);
+                }
             }
 
             showExpirationWarning(daysLeft) {
@@ -2916,249 +2961,137 @@
                 `;
                 warningContainer.style.display = 'block';
             }
+        }
 
-            async initLicenseCheck() {
-                setTimeout(async () => {
-                    const localLicense = this.getLocalLicense();
-                    
-                    if (!localLicense.key) {
-                        this.showLicenseScreen();
-                        return;
-                    }
+        // ========== FUNÇÕES DO SISTEMA DE LICENCIAMENTO ==========
+        let licenseValidator;
 
-                    try {
-                        const validation = await this.validateLicense(localLicense.key);
-                        
-                        if (!validation.valid) {
-                            this.clearLocalLicense();
-                            this.showLicenseScreen();
-                        } else {
-                            this.startPeriodicCheck();
-                            this.addLicenseIndicator(validation.licenseData);
-                        }
-                    } catch (error) {
-                        const localValidation = this.checkLocalValidity();
-                        
-                        if (!localValidation.valid) {
-                            this.showLicenseScreen();
-                        } else {
-                            console.warn('📶 Validação offline - conexão indisponível');
-                        }
-                    }
-                }, 100);
-            }
-
-            showLicenseScreen() {
-                let licenseScreen = document.getElementById('license-screen');
+        async function initLicenseSystem() {
+            try {
+                // Atualiza ano no footer
+                document.getElementById('current-year').textContent = new Date().getFullYear();
                 
-                if (!licenseScreen) {
-                    licenseScreen = document.createElement('div');
-                    licenseScreen.id = 'license-screen';
-                    licenseScreen.innerHTML = this.getLicenseScreenHTML();
-                    document.body.appendChild(licenseScreen);
-                    
-                    setTimeout(() => {
-                        const activateBtn = document.getElementById('activate-license-btn');
-                        const licenseInput = document.getElementById('license-key-input');
-                        
-                        if (activateBtn) {
-                            activateBtn.addEventListener('click', () => {
-                                this.handleActivation();
-                            });
-                        }
-                        
-                        if (licenseInput) {
-                            licenseInput.addEventListener('keypress', (e) => {
-                                if (e.key === 'Enter') {
-                                    this.handleActivation();
-                                }
-                            });
-                        }
-                    }, 100);
+                // Inicializa validador
+                licenseValidator = new SimpleLicenseValidator();
+                
+                // Aguarda inicialização
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Verifica licença local
+                const localLicense = licenseValidator.getLocalLicense();
+                
+                if (!localLicense.key) {
+                    // Sem licença, mostra tela de ativação
+                    document.getElementById('license-screen').classList.add('active');
+                    document.body.classList.add('license-active');
+                    return false;
                 }
                 
-                licenseScreen.style.display = 'flex';
+                // Tem licença local, verifica validade
+                const localCheck = licenseValidator.checkLocalValidity();
                 
-                document.querySelector('.container')?.style.setProperty('display', 'none', 'important');
-                document.querySelector('.history-btn')?.style.setProperty('display', 'none', 'important');
-            }
-
-            hideLicenseScreen() {
-                const licenseScreen = document.getElementById('license-screen');
-                if (licenseScreen) {
-                    licenseScreen.style.display = 'none';
+                if (!localCheck.valid) {
+                    // Licença local inválida
+                    document.getElementById('license-screen').classList.add('active');
+                    document.body.classList.add('license-active');
+                    return false;
                 }
                 
-                document.querySelector('.container')?.style.setProperty('display', 'block', 'important');
-                document.querySelector('.history-btn')?.style.setProperty('display', 'flex', 'important');
-            }
-
-            async handleActivation() {
-                const licenseInput = document.getElementById('license-key-input');
-                const statusMessage = document.getElementById('activation-status');
-                const activateBtn = document.getElementById('activate-license-btn');
-                
-                if (!licenseInput || !statusMessage) return;
-                
-                const licenseKey = licenseInput.value.trim().toUpperCase();
-                
-                if (!licenseKey) {
-                    statusMessage.innerHTML = '<span class="error">⚠️ Por favor, insira uma chave de licença</span>';
-                    return;
-                }
-
-                if (!/^PST-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(licenseKey)) {
-                    statusMessage.innerHTML = '<span class="error">⚠️ Formato inválido. Use: PST-XXXX-XXXX-XXXX</span>';
-                    return;
-                }
-
-                activateBtn.innerHTML = '⏳ Validando...';
-                activateBtn.disabled = true;
-                statusMessage.innerHTML = '<span class="info">🔍 Conectando ao servidor...</span>';
-
+                // Licença local válida, tenta validar online
                 try {
-                    const result = await this.activateLicense(licenseKey);
+                    const onlineCheck = await licenseValidator.validateLicense(localLicense.key);
                     
-                    if (result.valid) {
-                        statusMessage.innerHTML = '<span class="success">✅ Licença ativada com sucesso!</span>';
-                        activateBtn.innerHTML = '✅ Redirecionando...';
+                    if (onlineCheck.valid) {
+                        // Licença online válida
+                        document.body.classList.remove('license-active');
+                        licenseValidator.addLicenseIndicator(onlineCheck.licenseData);
                         
-                        setTimeout(() => {
-                            location.reload();
-                        }, 2000);
+                        // Verifica vencimento próximo
+                        const expiration = new Date(onlineCheck.licenseData.data_vencimento || localLicense.validade);
+                        const now = new Date();
+                        const daysLeft = Math.ceil((expiration - now) / (1000 * 60 * 60 * 24));
+                        
+                        if (daysLeft <= 3 && daysLeft > 0) {
+                            licenseValidator.showExpirationWarning(daysLeft);
+                        }
+                        
+                        return true;
                     } else {
-                        statusMessage.innerHTML = `<span class="error">❌ ${result.message}</span>`;
-                        activateBtn.innerHTML = '✅ Tentar Novamente';
-                        activateBtn.disabled = false;
+                        // Licença online inválida, mas local é válida (modo offline)
+                        document.body.classList.remove('license-active');
+                        licenseValidator.addLicenseIndicator(localLicense);
+                        console.warn('📶 Modo offline - usando licença local');
+                        return true;
                     }
-                } catch (error) {
-                    statusMessage.innerHTML = `<span class="error">❌ Erro de conexão. Verifique sua internet.</span>`;
-                    activateBtn.innerHTML = '✅ Tentar Novamente';
-                    activateBtn.disabled = false;
+                } catch (onlineError) {
+                    // Erro na validação online, usa local
+                    console.warn('Erro online, usando licença local:', onlineError);
+                    document.body.classList.remove('license-active');
+                    licenseValidator.addLicenseIndicator(localLicense);
+                    return true;
                 }
-            }
-
-            addLicenseIndicator(licenseData) {
-                const header = document.querySelector('.header');
-                if (!header) return;
-
-                const oldIndicator = document.getElementById('license-indicator');
-                if (oldIndicator) oldIndicator.remove();
-
-                const indicator = document.createElement('div');
-                indicator.id = 'license-indicator';
-                indicator.className = 'license-indicator';
-                indicator.innerHTML = `
-                    <span title="Licença ${licenseData.plano} - Válida até ${new Date(licenseData.data_vencimento).toLocaleDateString('pt-BR')}">
-                        ✅ ${licenseData.cliente_nome}
-                    </span>
-                `;
                 
-                const userBadge = document.querySelector('.user-badge');
-                if (userBadge && userBadge.parentNode) {
-                    userBadge.parentNode.insertBefore(indicator, userBadge);
-                }
-            }
-
-            getLicenseScreenHTML() {
-                return `
-                    <div class="license-container">
-                        <div class="license-card">
-                            <div class="license-header">
-                                <h1>🚀 Pet Shop Transport</h1>
-                                <h2>Ativação do Sistema</h2>
-                            </div>
-                            
-                            <div class="license-body">
-                                <div class="license-icon">
-                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                    </svg>
-                                </div>
-                                
-                                <p class="license-info">
-                                    Para usar o Pet Shop Transport, é necessário uma licença válida.
-                                </p>
-                                
-                                <div class="license-input-group">
-                                    <input 
-                                        type="text" 
-                                        id="license-key-input" 
-                                        placeholder="Digite sua chave (ex: PST-XXXX-XXXX-XXXX)"
-                                        class="license-input"
-                                        value="PST-WVVI-UK1U-X7YO"
-                                    >
-                                    <button id="activate-license-btn" class="license-button">
-                                        ✅ Ativar Licença
-                                    </button>
-                                </div>
-                                
-                                <div id="activation-status" class="license-status">
-                                    <!-- Mensagens de status aparecerão aqui -->
-                                </div>
-                                
-                                <div class="license-features">
-                                    <h3>✨ Recursos Incluídos:</h3>
-                                    <ul>
-                                        <li>✅ Gestão completa de transporte de pets</li>
-                                        <li>✅ Sistema PIX integrado</li>
-                                        <li>✅ Modos Admin e Motorista</li>
-                                        <li>✅ Sincronização em nuvem</li>
-                                        <li>✅ Suporte prioritário</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="license-support">
-                                    <h3>🆘 Precisa de ajuda?</h3>
-                                    <p>
-                                        <strong>Chave de Teste:</strong> PST-WVVI-UK1U-X7YO<br>
-                                        <strong>Suporte:</strong> suporte@petshoptransport.com<br>
-                                        <strong>Telefone:</strong> (11) 99999-9999
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="license-footer">
-                                <p>Pet Shop Transport © ${new Date().getFullYear()} - Sistema de Licenciamento</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            } catch (error) {
+                console.error('Erro na inicialização do sistema de licenciamento:', error);
+                document.getElementById('license-screen').classList.add('active');
+                document.body.classList.add('license-active');
+                return false;
             }
         }
 
-        // ========== FUNÇÕES DE VALIDAÇÃO DE LICENÇA ==========
-        function verificarLicencaInicial() {
-            const localLicense = {
-                key: localStorage.getItem('pst_license_key'),
-                validade: localStorage.getItem('pst_validade')
-            };
+        async function activateLicense() {
+            const licenseInput = document.getElementById('license-key-input');
+            const statusMessage = document.getElementById('activation-status');
+            const activateBtn = document.getElementById('activate-license-btn');
             
-            if (!localLicense.key) {
-                console.log('🔄 Nenhuma licença encontrada, aguardando sistema de licenciamento...');
-                return false;
+            if (!licenseInput || !statusMessage || !activateBtn || !licenseValidator) {
+                statusMessage.innerHTML = '<span class="error">❌ Sistema não inicializado</span>';
+                return;
             }
             
-            if (localLicense.validade) {
-                const expirationDate = new Date(localLicense.validade);
-                const now = new Date();
+            const licenseKey = licenseInput.value.trim().toUpperCase();
+            
+            if (!licenseKey) {
+                statusMessage.innerHTML = '<span class="error">⚠️ Digite uma chave de licença</span>';
+                return;
+            }
+            
+            // Valida formato básico
+            if (!licenseKey.startsWith('PST-') || licenseKey.length !== 19) {
+                statusMessage.innerHTML = '<span class="error">⚠️ Formato inválido. Use: PST-XXXX-XXXX-XXXX</span>';
+                return;
+            }
+            
+            // Mostra loading
+            activateBtn.innerHTML = '⏳ Validando...';
+            activateBtn.disabled = true;
+            statusMessage.innerHTML = '<span class="info">🔍 Conectando ao servidor...</span>';
+            
+            try {
+                const result = await licenseValidator.validateLicense(licenseKey);
                 
-                if (expirationDate < now) {
-                    console.log('⚠️ Licença vencida');
-                    return false;
+                if (result.valid) {
+                    statusMessage.innerHTML = '<span class="success">✅ Licença ativada com sucesso!</span>';
+                    activateBtn.innerHTML = '✅ Redirecionando...';
+                    
+                    // Aguarda e recarrega
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    statusMessage.innerHTML = `<span class="error">❌ ${result.message}</span>`;
+                    activateBtn.innerHTML = '✅ Tentar Novamente';
+                    activateBtn.disabled = false;
                 }
+            } catch (error) {
+                statusMessage.innerHTML = '<span class="error">❌ Erro de conexão. Verifique sua internet.</span>';
+                activateBtn.innerHTML = '✅ Tentar Novamente';
+                activateBtn.disabled = false;
             }
-            
-            return true;
         }
 
         // ========== FUNÇÕES BÁSICAS ==========
         function configurarInterface() {
-            if (!verificarLicencaInicial()) {
-                return;
-            }
-            
             const addBtn = document.getElementById('addBtn');
             const userBadge = document.getElementById('userBadge');
             const userRole = document.getElementById('userRole');
@@ -3182,22 +3115,6 @@
                 visualCounters.style.display = 'flex';
                 adminButtons.style.display = 'none';
                 searchContainer.style.display = 'block';
-            }
-            
-            const localLicense = {
-                key: localStorage.getItem('pst_license_key'),
-                clienteNome: localStorage.getItem('pst_cliente_nome'),
-                plano: localStorage.getItem('pst_plano')
-            };
-            
-            if (localLicense.key && window.licenseValidator) {
-                const licenseData = {
-                    cliente_nome: localLicense.clienteNome || 'Cliente',
-                    plano: localLicense.plano || 'basico',
-                    data_vencimento: localStorage.getItem('pst_validade')
-                };
-                
-                window.licenseValidator.addLicenseIndicator(licenseData);
             }
         }
 
@@ -4607,23 +4524,32 @@
         }
 
         // ========== INICIAR ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializa o sistema de licenciamento
-            const warningContainer = document.createElement('div');
-            warningContainer.id = 'license-warning';
-            document.body.appendChild(warningContainer);
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Configura botão de ativação
+            const activateBtn = document.getElementById('activate-license-btn');
+            if (activateBtn) {
+                activateBtn.addEventListener('click', activateLicense);
+            }
             
-            window.licenseValidator = new LicenseValidator();
+            // Configura Enter no input de licença
+            const licenseInput = document.getElementById('license-key-input');
+            if (licenseInput) {
+                licenseInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        activateLicense();
+                    }
+                });
+            }
             
-            // Verifica se tem licença válida
-            const hasLicense = verificarLicencaInicial();
+            // Inicializa sistema de licenciamento
+            const licenseValid = await initLicenseSystem();
             
-            if (hasLicense) {
-                // Tem licença, carrega normalmente
+            if (licenseValid) {
+                // Sistema liberado, inicializa app
                 configurarInterface();
-                carregarPets();
+                await carregarPets();
                 
-                // Configura eventos
+                // Configura eventos dos modais
                 document.getElementById('pixModal').addEventListener('click', (e) => {
                     if (e.target.id === 'pixModal') {
                         fecharModalPix();
@@ -4636,14 +4562,17 @@
                     }
                 });
                 
+                // Sincronização periódica
                 setInterval(() => carregarPets(false), 15000);
                 
+                // Recarrega quando voltar à aba
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'visible') {
                         carregarPets(false);
                     }
                 });
                 
+                // Adiciona estilos de animação
                 const style = document.createElement('style');
                 style.textContent = `
                     @keyframes slideInLeft {
@@ -4675,7 +4604,7 @@
                 `;
                 document.head.appendChild(style);
             } else {
-                // Não tem licença, aguarda ativação
+                // Sistema bloqueado, só mostra tela de ativação
                 console.log('⏳ Aguardando ativação da licença...');
             }
         });
