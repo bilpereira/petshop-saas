@@ -4,18 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐾 Pet Shop Transport</title>
-    
-    <!-- SISTEMA DE LICENCIAMENTO - SUPABASE SDK -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script>
-        // Configuração do sistema de licenciamento
-        window.LICENSE_CONFIG = {
-            TEST_KEY: "PST-WVVI-UK1U-X7YO",
-            SUPABASE_URL: "https://awirsiozohdgmmplugcl.supabase.co",
-            SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc"
-        };
-    </script>
-    
     <style>
         /* ============ VARIÁVEIS CSS ============ */
         :root {
@@ -83,284 +71,207 @@
             margin: 0 auto; 
         }
         
-        /* ============ ESTILOS DO SISTEMA DE LICENCIAMENTO ============ */
-        #license-screen {
+        /* ============ SISTEMA DE LICENÇA ============ */
+        #license-validation-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            padding: 20px;
-        }
-        
-        #license-screen.active {
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 9999;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
         }
-        
-        .license-container {
-            width: 100%;
-            max-width: 500px;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .license-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .license-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+
+        .license-modal {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border-radius: 25px;
             padding: 30px;
+            width: 450px;
+            max-width: 90vw;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--glass-border);
+            animation: slideInUp 0.6s ease-out;
             text-align: center;
         }
-        
-        .license-header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: bold;
+
+        .license-modal .modal-header {
+            margin-bottom: 25px;
         }
-        
-        .license-header h2 {
-            margin: 10px 0 0 0;
-            font-size: 18px;
-            opacity: 0.9;
-            font-weight: normal;
+
+        .license-modal .modal-header h2 {
+            font-size: 26px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
-        
-        .license-body {
-            padding: 30px;
+
+        .license-modal .modal-header p {
+            color: var(--gray-600);
+            font-size: 14px;
         }
-        
-        .license-icon {
-            text-align: center;
+
+        .status-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 15px;
+            padding: 20px;
             margin-bottom: 20px;
-            color: #667eea;
+            border: 2px solid #bfdbfe;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
-        .license-info {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
+
+        .status-card .status-icon {
+            font-size: 40px;
+            animation: pulse 2s infinite;
         }
-        
-        .license-input-group {
+
+        .status-card .status-content h3 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .status-card .status-content p {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .license-activation-form .input-group {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
-        @media (max-width: 600px) {
-            .license-input-group {
-                flex-direction: column;
-            }
-        }
-        
-        .license-input {
+
+        .license-activation-form input {
             flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            padding: 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            background: white;
         }
-        
-        .license-input:focus {
+
+        .license-activation-form input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
-        .license-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        #activate-license-btn {
+            background: var(--success-gradient);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 14px 24px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             white-space: nowrap;
         }
-        
-        .license-button:hover {
+
+        #activate-license-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+            box-shadow: var(--shadow-lg);
         }
-        
-        .license-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .license-status {
-            min-height: 40px;
-            margin-bottom: 20px;
-        }
-        
-        .license-status .success {
-            color: #10b981;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .license-status .error {
-            color: #ef4444;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .license-status .info {
-            color: #3b82f6;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .license-features {
+
+        .license-info {
             background: #f8fafc;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            text-align: left;
+            font-size: 13px;
         }
-        
-        .license-features h3 {
-            margin-top: 0;
-            color: #1e293b;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .license-features ul {
-            margin: 0;
-            padding-left: 20px;
-            color: #475569;
-        }
-        
-        .license-features li {
+
+        .license-info p {
             margin-bottom: 8px;
-        }
-        
-        .license-support {
-            border-top: 2px solid #e2e8f0;
-            padding-top: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .license-support h3 {
-            margin-top: 0;
-            color: #1e293b;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .license-support p {
-            margin: 0;
-            color: #475569;
-            line-height: 1.6;
-        }
-        
-        .license-footer {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 14px;
-            padding: 20px 30px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        /* Indicador de Licença no Header */
-        .license-indicator {
-            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 10px;
-            margin-right: 15px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 200px;
-        }
-        
-        .license-indicator:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-        }
-        
-        .license-indicator span {
+            color: var(--gray-700);
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        /* Aviso de Expiração */
-        #license-warning {
-            display: none;
+
+        .license-info strong {
+            color: var(--gray-900);
+            min-width: 100px;
+            display: inline-block;
+        }
+
+        /* Badge de Status da Licença */
+        #license-status-badge {
             position: fixed;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 99998;
-            width: 90%;
-            max-width: 500px;
+            right: 20px;
+            z-index: 9998;
+            animation: slideInRight 0.5s ease-out;
         }
-        
-        .license-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
+
+        .license-badge {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 8px 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .license-warning button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
+            gap: 8px;
+            box-shadow: var(--shadow-md);
             cursor: pointer;
-            padding: 0 10px;
-            line-height: 1;
+            transition: var(--transition);
         }
-        
-        /* Esconder conteúdo principal quando tela de licença está ativa */
-        .license-active .container,
-        .license-active .history-btn {
-            display: none !important;
+
+        .license-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
+
+        .license-status-icon {
+            font-size: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        .license-status-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .license-expiry {
+            font-size: 10px;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Animações específicas */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Classes de status da licença */
+        .license-valid { color: var(--success); }
+        .license-warning { color: var(--warning); }
+        .license-danger { color: var(--danger); }
         
         /* ============ HEADER COM CONTADORES ============ */
         .header { 
@@ -2393,6 +2304,33 @@
                 width: 100%;
                 margin: 5px 0;
             }
+            
+            .license-modal {
+                width: 90vw;
+                padding: 20px;
+            }
+            
+            .license-activation-form .input-group {
+                flex-direction: column;
+            }
+            
+            #license-status-badge {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .license-badge {
+                padding: 6px 10px;
+            }
+            
+            .license-status-text {
+                font-size: 10px;
+            }
+            
+            .license-expiry {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -2444,76 +2382,70 @@
                 width: 220px;
                 height: 220px;
             }
+            
+            .license-modal {
+                padding: 15px;
+            }
+            
+            .status-card .status-icon {
+                font-size: 30px;
+            }
+            
+            .status-card .status-content h3 {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- TELA DE ATIVAÇÃO DE LICENÇA -->
-    <div id="license-screen">
-        <div class="license-container">
-            <div class="license-card">
-                <div class="license-header">
-                    <h1>🚀 Pet Shop Transport</h1>
-                    <h2>Ativação do Sistema</h2>
-                </div>
-                
-                <div class="license-body">
-                    <div class="license-icon">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                    </div>
-                    
-                    <p class="license-info">
-                        Para usar o Pet Shop Transport, é necessário uma licença válida.
-                    </p>
-                    
-                    <div class="license-input-group">
-                        <input 
-                            type="text" 
-                            id="license-key-input" 
-                            placeholder="Digite sua chave (ex: PST-XXXX-XXXX-XXXX)"
-                            class="license-input"
-                            value="PST-WVVI-UK1U-X7YO"
-                        >
-                        <button id="activate-license-btn" class="license-button">
-                            ✅ Ativar Licença
-                        </button>
-                    </div>
-                    
-                    <div id="activation-status" class="license-status">
-                        <!-- Mensagens de status aparecerão aqui -->
-                    </div>
-                    
-                    <div class="license-features">
-                        <h3>✨ Recursos Incluídos:</h3>
-                        <ul>
-                            <li>✅ Gestão completa de transporte de pets</li>
-                            <li>✅ Sistema PIX integrado</li>
-                            <li>✅ Modos Admin e Motorista</li>
-                            <li>✅ Sincronização em nuvem</li>
-                            <li>✅ Suporte prioritário</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="license-support">
-                        <h3>🆘 Precisa de ajuda?</h3>
-                        <p>
-                            <strong>Chave de Teste:</strong> PST-WVVI-UK1U-X7YO<br>
-                            <strong>Suporte:</strong> suporte@petshoptransport.com<br>
-                            <strong>Telefone:</strong> (11) 99999-9999
-                        </p>
+    <!-- Sistema de Validação de Licença -->
+    <div id="license-validation-overlay" style="display: none;">
+        <div class="license-modal">
+            <div class="modal-header">
+                <h2>🔐 Validação de Licença</h2>
+                <p>Sistema de licenciamento automático</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="license-status-container">
+                    <div class="status-card">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-content">
+                            <h3>Validando licença...</h3>
+                            <p>Verificando acesso ao sistema</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="license-footer">
-                    <p>Pet Shop Transport © <span id="current-year">2024</span> - Sistema de Licenciamento</p>
+                <div class="license-activation-form" style="display: none;">
+                    <div class="input-group">
+                        <input type="text" 
+                               id="license-key-input" 
+                               placeholder="Digite sua chave de licença (ex: PST-WVVI-UK1U-X7YO)"
+                               maxlength="19"
+                               style="text-transform: uppercase">
+                        <button id="activate-license-btn">✅ Ativar Licença</button>
+                    </div>
+                    
+                    <div class="license-info">
+                        <p><strong>Chave de teste:</strong> PST-WVVI-UK1U-X7YO</p>
+                        <p><strong>Status:</strong> <span id="license-status-text">Aguardando ativação</span></p>
+                        <p><strong>Validade:</strong> <span id="license-validity">--/--/----</span></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Badge de Status da Licença (canto superior direito) -->
+    <div id="license-status-badge" style="display: none;">
+        <div class="license-badge">
+            <span class="license-status-icon">✅</span>
+            <span class="license-status-text">Licença Ativa</span>
+            <span class="license-expiry">Até 31/12/2025</span>
+        </div>
+    </div>
+    
     <!-- MODAL PIX -->
     <div class="modal-overlay" id="pixModal">
         <div class="modal-pix">
@@ -2731,6 +2663,448 @@
     </div>
 
     <script>
+        // ========== SISTEMA DE LICENÇA AUTOMÁTICO ==========
+        class AutoLicenseValidator {
+            constructor() {
+                this.SUPABASE_URL = "https://awirsiozohdgmmplugcl.supabase.co";
+                this.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc";
+                
+                // Cache de validação
+                this.cache = {
+                    licenseKey: null,
+                    lastValidation: null,
+                    isValid: false,
+                    expiresAt: null,
+                    clienteData: null
+                };
+                
+                // Configurações
+                this.config = {
+                    checkInterval: 5 * 60 * 1000, // 5 minutos
+                    cacheDuration: 24 * 60 * 60 * 1000, // 24 horas
+                    gracePeriod: 3 * 24 * 60 * 60 * 1000, // 3 dias
+                    retryAttempts: 3,
+                    retryDelay: 2000
+                };
+                
+                this.isValidating = false;
+                this.init();
+            }
+            
+            async init() {
+                // Carregar cache do localStorage
+                this.loadCache();
+                
+                // Validar automaticamente
+                const isValid = await this.autoValidate();
+                
+                if (!isValid) {
+                    // Se não for válido, mostrar interface de ativação
+                    this.showActivationUI();
+                } else {
+                    // Se for válido, esconder overlay e mostrar badge
+                    this.hideValidationOverlay();
+                    this.showStatusBadge();
+                    this.startPeriodicChecks();
+                }
+            }
+            
+            async autoValidate() {
+                try {
+                    // 1. Tentar validação rápida com cache
+                    if (this.isCacheValid()) {
+                        this.cache.isValid = true;
+                        this.updateStatusBadge();
+                        return true;
+                    }
+                    
+                    // 2. Verificar se há licença salva
+                    const savedLicense = localStorage.getItem('pst_license_key');
+                    if (!savedLicense) {
+                        console.log('❌ Nenhuma licença encontrada no localStorage');
+                        return false;
+                    }
+                    
+                    // 3. Validar com Supabase
+                    const isValid = await this.validateWithSupabase(savedLicense);
+                    
+                    if (isValid) {
+                        // Salvar no cache
+                        this.cache.licenseKey = savedLicense;
+                        this.cache.lastValidation = new Date().toISOString();
+                        this.cache.isValid = true;
+                        this.cache.expiresAt = isValid.data_vencimento;
+                        this.cache.clienteData = isValid.clientes;
+                        
+                        this.saveCache();
+                        this.updateStatusBadge();
+                        
+                        return true;
+                    } else {
+                        // Licença inválida
+                        this.cache.isValid = false;
+                        this.saveCache();
+                        return false;
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro na validação automática:', error);
+                    
+                    // Em caso de erro, usar cache estendido
+                    if (this.cache.licenseKey && this.isCacheValidExtended()) {
+                        console.log('⚠️ Usando cache estendido devido a erro de conexão');
+                        this.cache.isValid = true;
+                        this.updateStatusBadge();
+                        return true;
+                    }
+                    
+                    return false;
+                }
+            }
+            
+            async validateWithSupabase(licenseKey) {
+                // Limitar tentativas
+                for (let attempt = 1; attempt <= this.config.retryAttempts; attempt++) {
+                    try {
+                        // Usar fetch diretamente para evitar problemas CORS
+                        const response = await fetch(`${this.SUPABASE_URL}/rest/v1/licencas?chave=eq.${encodeURIComponent(licenseKey)}&select=*,clientes(*)`, {
+                            headers: {
+                                'apikey': this.SUPABASE_KEY,
+                                'Authorization': `Bearer ${this.SUPABASE_KEY}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (!data || data.length === 0) {
+                            return null;
+                        }
+                        
+                        const license = data[0];
+                        
+                        // Verificar se a licença está vencida
+                        const now = new Date();
+                        const expiresAt = new Date(license.data_vencimento);
+                        
+                        if (expiresAt < now) {
+                            console.log('❌ Licença vencida');
+                            return null;
+                        }
+                        
+                        return license;
+                        
+                    } catch (error) {
+                        console.log(`Tentativa ${attempt} falhou:`, error);
+                        
+                        if (attempt < this.config.retryAttempts) {
+                            await new Promise(resolve => setTimeout(resolve, this.config.retryDelay));
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+                
+                return null;
+            }
+            
+            loadCache() {
+                try {
+                    const cached = localStorage.getItem('pst_license_cache');
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        
+                        // Verificar se o cache ainda é válido
+                        const cacheAge = new Date() - new Date(parsed.lastValidation);
+                        if (cacheAge < this.config.cacheDuration) {
+                            this.cache = parsed;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar cache:', error);
+                }
+            }
+            
+            saveCache() {
+                try {
+                    localStorage.setItem('pst_license_cache', JSON.stringify(this.cache));
+                    localStorage.setItem('pst_license_key', this.cache.licenseKey || '');
+                    
+                    if (this.cache.clienteData) {
+                        localStorage.setItem('pst_cliente_id', this.cache.clienteData.id || '');
+                        localStorage.setItem('pst_cliente_nome', this.cache.clienteData.cnpj || '');
+                        localStorage.setItem('pst_validade', this.cache.expiresAt || '');
+                    }
+                } catch (error) {
+                    console.error('Erro ao salvar cache:', error);
+                }
+            }
+            
+            isCacheValid() {
+                if (!this.cache.lastValidation || !this.cache.isValid) return false;
+                
+                const cacheAge = new Date() - new Date(this.cache.lastValidation);
+                return cacheAge < this.config.cacheDuration;
+            }
+            
+            isCacheValidExtended() {
+                if (!this.cache.lastValidation) return false;
+                
+                const cacheAge = new Date() - new Date(this.cache.lastValidation);
+                return cacheAge < (this.config.cacheDuration * 3); // Cache estendido: 72 horas
+            }
+            
+            showActivationUI() {
+                const overlay = document.getElementById('license-validation-overlay');
+                const form = overlay.querySelector('.license-activation-form');
+                const statusCard = overlay.querySelector('.status-card');
+                
+                overlay.style.display = 'flex';
+                statusCard.style.display = 'none';
+                form.style.display = 'block';
+                
+                // Configurar botão de ativação
+                document.getElementById('activate-license-btn').onclick = () => this.activateLicense();
+                
+                // Permitir Enter para ativar
+                document.getElementById('license-key-input').onkeypress = (e) => {
+                    if (e.key === 'Enter') this.activateLicense();
+                };
+                
+                // Bloquear o app principal
+                this.blockMainApp();
+            }
+            
+            hideValidationOverlay() {
+                const overlay = document.getElementById('license-validation-overlay');
+                overlay.style.display = 'none';
+                this.unblockMainApp();
+            }
+            
+            showStatusBadge() {
+                const badge = document.getElementById('license-status-badge');
+                badge.style.display = 'block';
+                this.updateStatusBadge();
+            }
+            
+            updateStatusBadge() {
+                const badge = document.querySelector('.license-badge');
+                const statusIcon = badge.querySelector('.license-status-icon');
+                const statusText = badge.querySelector('.license-status-text');
+                const expiry = badge.querySelector('.license-expiry');
+                
+                if (!this.cache.isValid) {
+                    statusIcon.textContent = '❌';
+                    statusIcon.className = 'license-status-icon license-danger';
+                    statusText.textContent = 'Licença Inválida';
+                    expiry.textContent = 'Ativar';
+                    return;
+                }
+                
+                // Calcular dias restantes
+                const now = new Date();
+                const expiresAt = new Date(this.cache.expiresAt);
+                const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                
+                // Atualizar texto
+                if (daysLeft > this.config.gracePeriod / (1000 * 60 * 60 * 24)) {
+                    statusIcon.textContent = '✅';
+                    statusIcon.className = 'license-status-icon license-valid';
+                    statusText.textContent = 'Licença Ativa';
+                } else if (daysLeft > 0) {
+                    statusIcon.textContent = '⚠️';
+                    statusIcon.className = 'license-status-icon license-warning';
+                    statusText.textContent = `Expira em ${daysLeft} dias`;
+                } else {
+                    statusIcon.textContent = '❌';
+                    statusIcon.className = 'license-status-icon license-danger';
+                    statusText.textContent = 'Licença Expirada';
+                }
+                
+                // Formatar data
+                if (this.cache.expiresAt) {
+                    const date = new Date(this.cache.expiresAt);
+                    expiry.textContent = `Até ${date.toLocaleDateString('pt-BR')}`;
+                }
+            }
+            
+            async activateLicense() {
+                const input = document.getElementById('license-key-input');
+                const key = input.value.trim().toUpperCase();
+                const btn = document.getElementById('activate-license-btn');
+                const statusText = document.getElementById('license-status-text');
+                const validityText = document.getElementById('license-validity');
+                
+                if (!key || key.length < 10) {
+                    this.showLicenseMessage('⚠️ Chave inválida', 'warning');
+                    return;
+                }
+                
+                // Desabilitar botão
+                btn.disabled = true;
+                btn.textContent = 'Validando...';
+                statusText.textContent = 'Validando licença...';
+                statusText.className = '';
+                
+                try {
+                    const license = await this.validateWithSupabase(key);
+                    
+                    if (license) {
+                        // Licença válida
+                        this.cache.licenseKey = key;
+                        this.cache.lastValidation = new Date().toISOString();
+                        this.cache.isValid = true;
+                        this.cache.expiresAt = license.data_vencimento;
+                        this.cache.clienteData = license.clientes;
+                        
+                        this.saveCache();
+                        
+                        // Atualizar UI
+                        const expiresAt = new Date(license.data_vencimento);
+                        statusText.textContent = '✅ Licença Válida';
+                        statusText.className = 'license-valid';
+                        validityText.textContent = expiresAt.toLocaleDateString('pt-BR');
+                        
+                        this.showLicenseMessage('✅ Licença ativada com sucesso!', 'success');
+                        
+                        // Esperar 2 segundos e esconder overlay
+                        setTimeout(() => {
+                            this.hideValidationOverlay();
+                            this.showStatusBadge();
+                            this.startPeriodicChecks();
+                        }, 2000);
+                        
+                    } else {
+                        // Licença inválida
+                        statusText.textContent = '❌ Licença Inválida';
+                        statusText.className = 'license-danger';
+                        validityText.textContent = '--/--/----';
+                        
+                        this.showLicenseMessage('❌ Licença não encontrada ou vencida', 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro na ativação:', error);
+                    statusText.textContent = '⚠️ Erro de conexão';
+                    statusText.className = 'license-warning';
+                    this.showLicenseMessage('⚠️ Erro ao validar licença. Verifique sua conexão.', 'warning');
+                    
+                } finally {
+                    // Reabilitar botão
+                    btn.disabled = false;
+                    btn.textContent = '✅ Ativar Licença';
+                }
+            }
+            
+            showLicenseMessage(text, type) {
+                // Criar notificação
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b'};
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 10px;
+                    box-shadow: var(--shadow-xl);
+                    z-index: 10000;
+                    animation: slideInDown 0.3s ease-out;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                notification.innerHTML = `
+                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span>
+                    <span>${text}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutUp 0.3s ease-out';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+            
+            startPeriodicChecks() {
+                // Verificação periódica
+                setInterval(() => {
+                    this.autoValidate().then(isValid => {
+                        if (!isValid) {
+                            // Se ficar inválido, bloquear o app
+                            this.showActivationUI();
+                        }
+                    });
+                }, this.config.checkInterval);
+                
+                // Verificar vencimento a cada minuto
+                setInterval(() => {
+                    if (this.cache.expiresAt) {
+                        const now = new Date();
+                        const expiresAt = new Date(this.cache.expiresAt);
+                        const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                        
+                        // Alertar 3 dias antes
+                        if (daysLeft === 3) {
+                            this.showLicenseMessage(`⚠️ Sua licença expira em ${daysLeft} dias`, 'warning');
+                        }
+                        
+                        // Alertar no último dia
+                        if (daysLeft === 1) {
+                            this.showLicenseMessage('⚠️ Sua licença expira AMANHÃ!', 'warning');
+                        }
+                        
+                        this.updateStatusBadge();
+                    }
+                }, 60 * 1000); // 1 minuto
+            }
+            
+            blockMainApp() {
+                const mainElements = [
+                    '.header', '.sync-status', '.next-pickup-highlight',
+                    '#addBtn', '#formContainer', '.pets-list',
+                    '.history-btn'
+                ];
+                
+                mainElements.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(el => {
+                        el.style.filter = 'blur(5px)';
+                        el.style.opacity = '0.5';
+                        el.style.pointerEvents = 'none';
+                        el.style.userSelect = 'none';
+                    });
+                });
+            }
+            
+            unblockMainApp() {
+                const mainElements = [
+                    '.header', '.sync-status', '.next-pickup-highlight',
+                    '#addBtn', '#formContainer', '.pets-list',
+                    '.history-btn'
+                ];
+                
+                mainElements.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(el => {
+                        el.style.filter = '';
+                        el.style.opacity = '';
+                        el.style.pointerEvents = '';
+                        el.style.userSelect = '';
+                    });
+                });
+            }
+        }
+
         // ========== CONFIGURAÇÃO ==========
         const JSONBIN_CONFIG = {
             BIN_ID: '695de16743b1c97be91e7eeb',
@@ -2755,340 +3129,6 @@
             qrcodeUrl: 'https://i.imgur.com/paZK1Tx.png',
             qrcodeBackup: 'https://imgur.com/paZK1Tx'
         };
-
-        // ========== SISTEMA DE LICENCIAMENTO SIMPLIFICADO ==========
-        class SimpleLicenseValidator {
-            constructor() {
-                this.supabaseUrl = window.LICENSE_CONFIG.SUPABASE_URL;
-                this.supabaseKey = window.LICENSE_CONFIG.SUPABASE_KEY;
-                this.supabase = null;
-                this.initialized = false;
-                this.init();
-            }
-
-            async init() {
-                try {
-                    // Usando a variável global do Supabase do CDN
-                    this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
-                    this.initialized = true;
-                    console.log('✅ Supabase inicializado com sucesso');
-                } catch (error) {
-                    console.error('❌ Erro ao inicializar Supabase:', error);
-                }
-            }
-
-            getLocalLicense() {
-                try {
-                    return {
-                        key: localStorage.getItem('pst_license_key'),
-                        clienteId: localStorage.getItem('pst_cliente_id'),
-                        clienteNome: localStorage.getItem('pst_cliente_nome') || 'Cliente Pet Shop',
-                        validade: localStorage.getItem('pst_validade'),
-                        plano: localStorage.getItem('pst_plano') || 'basico'
-                    };
-                } catch (error) {
-                    console.error('Erro ao ler licença local:', error);
-                    return {};
-                }
-            }
-
-            saveLocalLicense(data) {
-                try {
-                    if (data.chave) localStorage.setItem('pst_license_key', data.chave);
-                    if (data.cliente_id) localStorage.setItem('pst_cliente_id', data.cliente_id);
-                    localStorage.setItem('pst_cliente_nome', data.cliente_nome || 'Cliente Pet Shop');
-                    localStorage.setItem('pst_validade', data.data_vencimento || '');
-                    localStorage.setItem('pst_plano', data.plano || 'basico');
-                    localStorage.setItem('pst_last_validation', new Date().toISOString());
-                    return true;
-                } catch (error) {
-                    console.error('Erro ao salvar licença:', error);
-                    return false;
-                }
-            }
-
-            clearLocalLicense() {
-                try {
-                    localStorage.removeItem('pst_license_key');
-                    localStorage.removeItem('pst_cliente_id');
-                    localStorage.removeItem('pst_cliente_nome');
-                    localStorage.removeItem('pst_validade');
-                    localStorage.removeItem('pst_plano');
-                    localStorage.removeItem('pst_last_validation');
-                } catch (error) {
-                    console.error('Erro ao limpar licença:', error);
-                }
-            }
-
-            async validateLicense(licenseKey) {
-                if (!this.initialized || !this.supabase) {
-                    return {
-                        valid: false,
-                        message: 'Sistema não inicializado',
-                        error: 'Supabase não disponível'
-                    };
-                }
-
-                try {
-                    console.log('🔍 Validando licença:', licenseKey);
-                    
-                    // Busca direta na tabela licencas
-                    const { data: license, error } = await this.supabase
-                        .from('licencas')
-                        .select('*')
-                        .eq('chave', licenseKey)
-                        .maybeSingle();
-
-                    if (error || !license) {
-                        console.log('Licença não encontrada:', error);
-                        return {
-                            valid: false,
-                            message: 'Licença não encontrada',
-                            error: error?.message
-                        };
-                    }
-
-                    // Verifica vencimento
-                    const now = new Date();
-                    const expiration = new Date(license.data_vencimento);
-                    
-                    if (expiration < now) {
-                        return {
-                            valid: false,
-                            message: 'Licença vencida',
-                            licenseData: license
-                        };
-                    }
-
-                    // Busca cliente associado
-                    let clienteNome = 'Cliente Pet Shop';
-                    let plano = 'basico';
-                    
-                    if (license.cliente_id) {
-                        const { data: cliente } = await this.supabase
-                            .from('clientes')
-                            .select('nome, plano')
-                            .eq('id', license.cliente_id)
-                            .maybeSingle();
-                        
-                        if (cliente) {
-                            clienteNome = cliente.nome || 'Cliente Pet Shop';
-                            plano = cliente.plano || 'basico';
-                        }
-                    }
-
-                    const licenseData = {
-                        ...license,
-                        cliente_nome: clienteNome,
-                        plano: plano
-                    };
-
-                    this.saveLocalLicense(licenseData);
-                    
-                    return {
-                        valid: true,
-                        message: 'Licença válida',
-                        licenseData: licenseData
-                    };
-
-                } catch (error) {
-                    console.error('Erro na validação:', error);
-                    return {
-                        valid: false,
-                        message: 'Erro na validação',
-                        error: error.message
-                    };
-                }
-            }
-
-            checkLocalValidity() {
-                const local = this.getLocalLicense();
-                
-                if (!local.key || !local.validade) {
-                    return { valid: false, message: 'Licença não encontrada' };
-                }
-
-                const now = new Date();
-                const expiration = new Date(local.validade);
-                
-                if (expiration < now) {
-                    return { valid: false, message: 'Licença vencida (offline)' };
-                }
-
-                return {
-                    valid: true,
-                    message: 'Licença válida (offline)',
-                    licenseData: local
-                };
-            }
-
-            addLicenseIndicator(licenseData) {
-                const header = document.querySelector('.header');
-                if (!header) return;
-
-                // Remove indicador anterior
-                const oldIndicator = document.getElementById('license-indicator');
-                if (oldIndicator) oldIndicator.remove();
-
-                const indicator = document.createElement('div');
-                indicator.id = 'license-indicator';
-                indicator.className = 'license-indicator';
-                indicator.innerHTML = `
-                    <span title="Licença ${licenseData.plano} - Válida até ${new Date(licenseData.validade || licenseData.data_vencimento).toLocaleDateString('pt-BR')}">
-                        ✅ ${licenseData.cliente_nome || licenseData.clienteNome || 'Cliente'}
-                    </span>
-                `;
-                
-                const userBadge = document.querySelector('.user-badge');
-                if (userBadge && userBadge.parentNode) {
-                    userBadge.parentNode.insertBefore(indicator, userBadge);
-                }
-            }
-
-            showExpirationWarning(daysLeft) {
-                const warningContainer = document.getElementById('license-warning');
-                if (!warningContainer) {
-                    const container = document.createElement('div');
-                    container.id = 'license-warning';
-                    document.body.appendChild(container);
-                }
-
-                warningContainer.innerHTML = `
-                    <div class="license-warning">
-                        <span>⚠️ Sua licença vence em ${daysLeft} dia${daysLeft === 1 ? '' : 's'}. Entre em contato para renovação.</span>
-                        <button onclick="document.getElementById('license-warning').style.display='none'">×</button>
-                    </div>
-                `;
-                warningContainer.style.display = 'block';
-            }
-        }
-
-        // ========== FUNÇÕES DO SISTEMA DE LICENCIAMENTO ==========
-        let licenseValidator;
-
-        async function initLicenseSystem() {
-            try {
-                // Atualiza ano no footer
-                document.getElementById('current-year').textContent = new Date().getFullYear();
-                
-                // Inicializa validador
-                licenseValidator = new SimpleLicenseValidator();
-                
-                // Aguarda inicialização
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Verifica licença local
-                const localLicense = licenseValidator.getLocalLicense();
-                
-                if (!localLicense.key) {
-                    // Sem licença, mostra tela de ativação
-                    document.getElementById('license-screen').classList.add('active');
-                    document.body.classList.add('license-active');
-                    return false;
-                }
-                
-                // Tem licença local, verifica validade
-                const localCheck = licenseValidator.checkLocalValidity();
-                
-                if (!localCheck.valid) {
-                    // Licença local inválida
-                    document.getElementById('license-screen').classList.add('active');
-                    document.body.classList.add('license-active');
-                    return false;
-                }
-                
-                // Licença local válida, tenta validar online
-                try {
-                    const onlineCheck = await licenseValidator.validateLicense(localLicense.key);
-                    
-                    if (onlineCheck.valid) {
-                        // Licença online válida
-                        document.body.classList.remove('license-active');
-                        licenseValidator.addLicenseIndicator(onlineCheck.licenseData);
-                        
-                        // Verifica vencimento próximo
-                        const expiration = new Date(onlineCheck.licenseData.data_vencimento || localLicense.validade);
-                        const now = new Date();
-                        const daysLeft = Math.ceil((expiration - now) / (1000 * 60 * 60 * 24));
-                        
-                        if (daysLeft <= 3 && daysLeft > 0) {
-                            licenseValidator.showExpirationWarning(daysLeft);
-                        }
-                        
-                        return true;
-                    } else {
-                        // Licença online inválida, mas local é válida (modo offline)
-                        document.body.classList.remove('license-active');
-                        licenseValidator.addLicenseIndicator(localLicense);
-                        console.warn('📶 Modo offline - usando licença local');
-                        return true;
-                    }
-                } catch (onlineError) {
-                    // Erro na validação online, usa local
-                    console.warn('Erro online, usando licença local:', onlineError);
-                    document.body.classList.remove('license-active');
-                    licenseValidator.addLicenseIndicator(localLicense);
-                    return true;
-                }
-                
-            } catch (error) {
-                console.error('Erro na inicialização do sistema de licenciamento:', error);
-                document.getElementById('license-screen').classList.add('active');
-                document.body.classList.add('license-active');
-                return false;
-            }
-        }
-
-        async function activateLicense() {
-            const licenseInput = document.getElementById('license-key-input');
-            const statusMessage = document.getElementById('activation-status');
-            const activateBtn = document.getElementById('activate-license-btn');
-            
-            if (!licenseInput || !statusMessage || !activateBtn || !licenseValidator) {
-                statusMessage.innerHTML = '<span class="error">❌ Sistema não inicializado</span>';
-                return;
-            }
-            
-            const licenseKey = licenseInput.value.trim().toUpperCase();
-            
-            if (!licenseKey) {
-                statusMessage.innerHTML = '<span class="error">⚠️ Digite uma chave de licença</span>';
-                return;
-            }
-            
-            // Valida formato básico
-            if (!licenseKey.startsWith('PST-') || licenseKey.length !== 19) {
-                statusMessage.innerHTML = '<span class="error">⚠️ Formato inválido. Use: PST-XXXX-XXXX-XXXX</span>';
-                return;
-            }
-            
-            // Mostra loading
-            activateBtn.innerHTML = '⏳ Validando...';
-            activateBtn.disabled = true;
-            statusMessage.innerHTML = '<span class="info">🔍 Conectando ao servidor...</span>';
-            
-            try {
-                const result = await licenseValidator.validateLicense(licenseKey);
-                
-                if (result.valid) {
-                    statusMessage.innerHTML = '<span class="success">✅ Licença ativada com sucesso!</span>';
-                    activateBtn.innerHTML = '✅ Redirecionando...';
-                    
-                    // Aguarda e recarrega
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                } else {
-                    statusMessage.innerHTML = `<span class="error">❌ ${result.message}</span>`;
-                    activateBtn.innerHTML = '✅ Tentar Novamente';
-                    activateBtn.disabled = false;
-                }
-            } catch (error) {
-                statusMessage.innerHTML = '<span class="error">❌ Erro de conexão. Verifique sua internet.</span>';
-                activateBtn.innerHTML = '✅ Tentar Novamente';
-                activateBtn.disabled = false;
-            }
-        }
 
         // ========== FUNÇÕES BÁSICAS ==========
         function configurarInterface() {
@@ -3125,6 +3165,7 @@
             const submitBtn = form.querySelector('.submit-btn');
             
             if (form.classList.contains('active')) {
+                // Fechar formulário
                 form.classList.remove('active');
                 btn.textContent = '➕ Adicionar Pet';
                 submitBtn.textContent = '✨ Adicionar Transporte';
@@ -3132,6 +3173,7 @@
                 cancelarEdicao();
                 resetarFormularioMultiPet();
             } else {
+                // Abrir formulário
                 form.classList.add('active');
                 btn.textContent = '❌ Cancelar';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3145,6 +3187,7 @@
             const additionalPetsContainer = document.getElementById('additionalPetsContainer');
             additionalPetsContainer.innerHTML = '';
             
+            // Resetar campos do primeiro pet
             document.getElementById('nomePet').value = '';
             document.getElementById('raca').value = '';
             document.getElementById('cor').value = '';
@@ -3203,6 +3246,7 @@
             
             additionalPetsContainer.appendChild(petDiv);
             
+            // Salvar dados no array
             petsAdicionais.push({
                 id: petId,
                 nomePet: '',
@@ -3217,20 +3261,24 @@
                 petDiv.remove();
                 totalPetsNoForm--;
                 
+                // Remover do array
                 petsAdicionais = petsAdicionais.filter(p => p.id !== petId);
                 
+                // Renumerar os pets restantes
                 const petItems = document.querySelectorAll('.multi-pet-item');
                 petItems.forEach((item, index) => {
-                    const newId = index + 2;
+                    const newId = index + 2; // Começa do 2
                     item.id = `petAdicional${newId}`;
                     const numberDiv = item.querySelector('.multi-pet-number');
                     if (numberDiv) numberDiv.textContent = newId;
                     
+                    // Atualizar botão de remover
                     const removeBtn = item.querySelector('.remove-pet-btn');
                     if (removeBtn) {
                         removeBtn.onclick = function() { removerPetAdicional(newId); };
                     }
                     
+                    // Atualizar no array
                     const petIndex = petsAdicionais.findIndex(p => p.id === parseInt(item.id.replace('petAdicional', '')));
                     if (petIndex !== -1) {
                         petsAdicionais[petIndex].id = newId;
@@ -3258,6 +3306,7 @@
                   p.status === 'A caminho retirada')
             );
             
+            // Ordenar por status prioritário
             emTransporte.sort((a, b) => {
                 const statusOrder = {
                     'A caminho da loja': 1,
@@ -3339,12 +3388,13 @@
             }
         }
 
-        // ========== PRÓXIMA RETIRADA ==========
+        // ========== PRÓXIMA RETIRADA - CORREÇÃO COMPLETA ==========
         function mostrarProximaRetirada() {
             const highlight = document.getElementById('nextPickupHighlight');
             const agora = new Date();
             const horaAtual = agora.getHours() * 60 + agora.getMinutes();
             
+            // 🔥 1. PETS POR HORÁRIO (próximas 2 horas)
             const petsHorarioProximo = pets.filter(p => 
                 !p.arquivado && 
                 p.status !== 'Entregue' &&
@@ -3358,20 +3408,25 @@
               .sort((a, b) => a.diferenca - b.diferenca)
               .map(item => item.pet);
             
+            // 🔥 2. PETS AGUARDANDO RETIRADA (status vazio ou "A caminho retirada")
             const petsAguardando = pets.filter(p => 
                 !p.arquivado && 
                 p.status !== 'Entregue' &&
                 (p.status === '' || p.status === 'A caminho retirada')
             );
             
+            // 🔥 3. PETS COM PRIORIDADE ALTA
             const petsPrioridadeAlta = pets.filter(p => 
                 !p.arquivado && 
                 p.prioridade === 'alta' 
             );
             
+            // Juntar todas as listas (sem duplicados)
             const todosPetsProximaRetirada = [];
             const idsAdicionados = new Set();
             
+            // Adicionar por ordem de prioridade:
+            // 1. Horário próximo
             petsHorarioProximo.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -3379,6 +3434,7 @@
                 }
             });
             
+            // 2. Prioridade alta
             petsPrioridadeAlta.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -3386,6 +3442,7 @@
                 }
             });
             
+            // 3. Aguardando retirada
             petsAguardando.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -3433,6 +3490,7 @@
             const visualCounters = document.getElementById('visualCounters');
             
             if (!isAdmin) {
+                // VISÃO MOTORISTA
                 const aguardandoRetirada = pets.filter(p => 
                     !p.arquivado && 
                     (p.status === '' || p.status === 'A caminho retirada')
@@ -3524,6 +3582,7 @@
                     </div>
                 `;
             } else {
+                // VISÃO ADMIN
                 const aguardando = pets.filter(p => !p.arquivado && p.status !== 'Entregue' && 
                     (p.status === 'A caminho retirada' || !p.status || p.status === ''));
                 
@@ -4524,32 +4583,99 @@
         }
 
         // ========== INICIAR ==========
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Configura botão de ativação
-            const activateBtn = document.getElementById('activate-license-btn');
-            if (activateBtn) {
-                activateBtn.addEventListener('click', activateLicense);
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Iniciar validador automaticamente
+            window.licenseValidator = new AutoLicenseValidator();
             
-            // Configura Enter no input de licença
-            const licenseInput = document.getElementById('license-key-input');
-            if (licenseInput) {
-                licenseInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        activateLicense();
+            // Adicionar estilo para notificações
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInLeft {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
                     }
-                });
-            }
-            
-            // Inicializa sistema de licenciamento
-            const licenseValid = await initLicenseSystem();
-            
-            if (licenseValid) {
-                // Sistema liberado, inicializa app
-                configurarInterface();
-                await carregarPets();
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
                 
-                // Configura eventos dos modais
+                @keyframes slideOutRight {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                }
+                
+                @keyframes slideInDown {
+                    from {
+                        opacity: 0;
+                        transform: translate(-50%, -20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translate(-50%, 0);
+                    }
+                }
+                
+                @keyframes slideOutUp {
+                    from {
+                        opacity: 1;
+                        transform: translate(-50%, 0);
+                    }
+                    to {
+                        opacity: 0;
+                        transform: translate(-50%, -20px);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Verificar se a licença é válida antes de carregar o app
+            const checkLicense = () => {
+                const cache = localStorage.getItem('pst_license_cache');
+                if (cache) {
+                    const parsed = JSON.parse(cache);
+                    const cacheAge = new Date() - new Date(parsed.lastValidation);
+                    
+                    // Se cache for válido (menos de 24 horas), permitir carregamento
+                    if (cacheAge < 24 * 60 * 60 * 1000 && parsed.isValid) {
+                        initApp();
+                        return;
+                    }
+                }
+                
+                // Esperar pela validação automática
+                const checkInterval = setInterval(() => {
+                    const overlay = document.getElementById('license-validation-overlay');
+                    if (overlay.style.display === 'none') {
+                        clearInterval(checkInterval);
+                        initApp();
+                    }
+                    
+                    // Timeout de segurança (10 segundos)
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        console.log('❌ Timeout na validação da licença');
+                    }, 10000);
+                }, 100);
+            };
+            
+            const initApp = () => {
+                // Configurar interface apenas se licença válida
+                configurarInterface();
+                carregarPets();
+                
                 document.getElementById('pixModal').addEventListener('click', (e) => {
                     if (e.target.id === 'pixModal') {
                         fecharModalPix();
@@ -4562,51 +4688,17 @@
                     }
                 });
                 
-                // Sincronização periódica
                 setInterval(() => carregarPets(false), 15000);
                 
-                // Recarrega quando voltar à aba
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'visible') {
                         carregarPets(false);
                     }
                 });
-                
-                // Adiciona estilos de animação
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes slideInLeft {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                    }
-                    
-                    @keyframes slideOutRight {
-                        from {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                        to {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                    }
-                    
-                    @keyframes pulse {
-                        0%, 100% { box-shadow: var(--shadow-lg); }
-                        50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
-                    }
-                `;
-                document.head.appendChild(style);
-            } else {
-                // Sistema bloqueado, só mostra tela de ativação
-                console.log('⏳ Aguardando ativação da licença...');
-            }
+            };
+            
+            // Iniciar verificação de licença
+            checkLicense();
         });
 
         async function mostrarPetsComOrdem(petsOrdenados) {
