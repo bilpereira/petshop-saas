@@ -3153,7 +3153,7 @@
         const SUPABASE_CONFIG = {
             url: 'https://awirsiozohdgmmplugcl.supabase.co',
             key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc',
-            cliente_id: 'CLIENTE_ID_AQUI' // ⚠️ SUBSTITUIR COM ID REAL DO CLIENTE
+            cliente_id: 'pet_shop_bosque' // ⚠️ SUBSTITUIR COM ID REAL DO CLIENTE
         };
 
         // Cliente Supabase para operações CRUD
@@ -3410,153 +3410,85 @@
 
         // ========== FUNÇÕES SUPABASE PARA CARREGAR E SALVAR ==========
         async function carregarPets(forcarSync = false) {
+    try {
+        console.log('🔄 Carregando pets...');
+        
+        // 1. Tentar carregar do Supabase
+        if (supabase.conexaoAtiva) {
             try {
-                // 1. Tentar carregar do Supabase
-                if (supabase.conexaoAtiva) {
-                    try {
-                        // Carregar pets do Supabase
-                        const petsSupabase = await supabase.query('rest/v1/pets?select=*&order=created_at.desc');
+                console.log('🌐 Conectando ao Supabase...');
+                const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets?select=*&order=created_at.desc`, {
+                    headers: supabase.headers
+                });
+                
+                if (response.ok) {
+                    const petsSupabase = await response.json();
+                    console.log(`📊 Resposta do Supabase:`, petsSupabase);
+                    
+                    if (petsSupabase && petsSupabase.length > 0) {
+                        pets = petsSupabase.map(pet => ({
+                            id: pet.id || Date.now() + Math.random(),
+                            supabase_id: pet.id,
+                            clienteId: pet.cliente_id || SUPABASE_CONFIG.cliente_id,
+                            cliente: pet.cliente_nome || 'Cliente não informado',
+                            nomePet: pet.nome_pet || 'Pet sem nome',
+                            raca: pet.raca || '',
+                            cor: pet.cor || '',
+                            endereco: pet.endereco || '',
+                            tempo: pet.tempo || '',
+                            horaRetirada: pet.hora_retirada || '',
+                            valorPix: pet.valor_pix || 50.00,
+                            status: pet.status || '',
+                            pagamento: pet.pagamento || 'Pendente',
+                            observacoesAdmin: pet.observacoes_admin || '',
+                            observacoesMotorista: pet.observacoes_motorista || '',
+                            horaEntregue: pet.hora_entregue || null,
+                            valorRecebido: pet.valor_recebido || null,
+                            dataPagamento: pet.data_pagamento || null,
+                            arquivado: pet.arquivado || false,
+                            prioridade: pet.prioridade || null,
+                            petsAdicionais: pet.pets_adicionais || [],
+                            dataCriacao: pet.created_at || new Date().toISOString(),
+                            pagamentoCollapsed: true
+                        }));
                         
-                        if (petsSupabase && petsSupabase.length > 0) {
-                            // Converter formato Supabase para formato do app
-                            pets = petsSupabase.map(pet => ({
-                                id: pet.id || Date.now() + Math.random(),
-                                supabase_id: pet.id, // Guardar ID do Supabase
-                                clienteId: pet.cliente_id || SUPABASE_CONFIG.cliente_id,
-                                cliente: pet.cliente_nome || 'Cliente não informado',
-                                nomePet: pet.nome_pet || 'Pet sem nome',
-                                raca: pet.raca || '',
-                                cor: pet.cor || '',
-                                endereco: pet.endereco || '',
-                                tempo: pet.tempo || '',
-                                horaRetirada: pet.hora_retirada || '',
-                                valorPix: pet.valor_pix || 50.00,
-                                status: pet.status || '',
-                                pagamento: pet.pagamento || 'Pendente',
-                                observacoesAdmin: pet.observacoes_admin || '',
-                                observacoesMotorista: pet.observacoes_motorista || '',
-                                horaEntregue: pet.hora_entregue || null,
-                                valorRecebido: pet.valor_recebido || null,
-                                dataPagamento: pet.data_pagamento || null,
-                                arquivado: pet.arquivado || false,
-                                prioridade: pet.prioridade || null,
-                                petsAdicionais: pet.pets_adicionais || [],
-                                dataCriacao: pet.created_at || new Date().toISOString(),
-                                pagamentoCollapsed: true
-                            }));
-                            
-                            console.log(`✅ Carregados ${pets.length} pets do Supabase`);
-                            
-                            await mostrarPets();
-                            atualizarHora();
-                            mostrarProximaRetirada();
-                            atualizarHistoricoEntregas();
-                            atualizarCardsVisuais();
-                            
-                            if (forcarSync) {
-                                mostrarMensagem('✅ Dados atualizados do Supabase!', 'success');
-                            }
-                            
-                            return;
-                        } else {
-                            pets = [];
-                        }
-                        
-                    } catch (error) {
-                        console.warn('❌ Erro ao carregar do Supabase:', error.message);
+                        console.log(`✅ Carregados ${pets.length} pets do Supabase`);
+                    } else {
+                        pets = [];
+                        console.log('📭 Nenhum pet encontrado no Supabase');
                     }
-                }
-                
-                // 2. Fallback para localStorage se Supabase falhar
-                console.log('📦 Usando dados locais do localStorage');
-                const local = localStorage.getItem('meusPets');
-                pets = local ? JSON.parse(local) : [];
-                
-                await mostrarPets();
-                atualizarHora();
-                mostrarProximaRetirada();
-                atualizarHistoricoEntregas();
-                atualizarCardsVisuais();
-                
-                if (forcarSync) {
-                    mostrarMensagem('⚠️ Usando dados locais', 'warning');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
             } catch (error) {
-                console.error('Erro ao carregar pets:', error);
-                mostrarMensagem('❌ Erro ao carregar dados', 'error');
+                console.warn('❌ Erro ao carregar do Supabase:', error);
+                // Fallback para localStorage
+                const local = localStorage.getItem('meusPets');
+                pets = local ? JSON.parse(local) : [];
+                console.log('📦 Usando dados locais do localStorage');
             }
+        } else {
+            // Fallback para localStorage
+            const local = localStorage.getItem('meusPets');
+            pets = local ? JSON.parse(local) : [];
+            console.log('📦 Supabase offline, usando dados locais');
         }
-
-        async function salvarPets() {
-            // 1. Salvar backup local
-            localStorage.setItem('meusPets', JSON.stringify(pets));
-            
-            // 2. Tentar salvar no Supabase (se conectado)
-            if (supabase.conexaoAtiva) {
-                try {
-                    // Para cada pet, verificar se já existe no Supabase
-                    for (const pet of pets) {
-                        try {
-                            const petSupabase = {
-                                cliente_id: SUPABASE_CONFIG.cliente_id,
-                                cliente_nome: pet.cliente || 'Cliente não informado',
-                                nome_pet: pet.nomePet || pet.nome || 'Pet sem nome',
-                                raca: pet.raca || '',
-                                cor: pet.cor || '',
-                                endereco: pet.endereco || '',
-                                tempo: pet.tempo || '',
-                                hora_retirada: pet.horaRetirada || null,
-                                valor_pix: pet.valorPix || null,
-                                status: pet.status || '',
-                                pagamento: pet.pagamento || 'Pendente',
-                                observacoes_admin: pet.observacoesAdmin || '',
-                                observacoes_motorista: pet.observacoesMotorista || '',
-                                hora_entregue: pet.horaEntregue || null,
-                                valor_recebido: pet.valorRecebido || null,
-                                data_pagamento: pet.dataPagamento || null,
-                                arquivado: pet.arquivado || false,
-                                prioridade: pet.prioridade || null,
-                                pets_adicionais: pet.petsAdicionais || [],
-                                updated_at: new Date().toISOString()
-                            };
-                            
-                            if (pet.supabase_id) {
-                                // Atualizar pet existente
-                                await supabase.query(`rest/v1/pets?id=eq.${pet.supabase_id}`, {
-                                    method: 'PATCH',
-                                    body: JSON.stringify(petSupabase)
-                                });
-                            } else {
-                                // Criar novo pet
-                                const response = await supabase.query('rest/v1/pets', {
-                                    method: 'POST',
-                                    body: JSON.stringify({
-                                        ...petSupabase,
-                                        created_at: pet.dataCriacao || new Date().toISOString()
-                                    })
-                                });
-                                
-                                // Salvar ID do Supabase no pet local
-                                if (response && response[0]) {
-                                    pet.supabase_id = response[0].id;
-                                }
-                            }
-                            
-                        } catch (error) {
-                            console.warn(`Erro ao salvar pet ${pet.id} no Supabase:`, error.message);
-                        }
-                    }
-                    
-                    console.log('✅ Dados sincronizados com Supabase');
-                    
-                } catch (error) {
-                    console.warn('❌ Erro ao sincronizar com Supabase:', error);
-                }
-            }
-            
-            return true;
-        }
+        
+        // Mostrar na interface
+        await mostrarPets();
+        atualizarHora();
+        mostrarProximaRetirada();
+        atualizarHistoricoEntregas();
+        atualizarCardsVisuais();
+        
+        console.log('✅ App carregado com sucesso');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar pets:', error);
+        mostrarMensagem('❌ Erro ao carregar dados', 'error');
+    }
+}
 
         // ========== CONTINUAÇÃO DO CÓDIGO ==========
         function aplicarOrdenacaoDinamicaCorrigida() {
@@ -4944,3 +4876,4 @@
     </script>
 </body>
 </html>
+
