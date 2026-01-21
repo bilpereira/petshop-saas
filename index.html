@@ -2505,38 +2505,8 @@
         📋
     </button>
 
-    <!-- Menu de Controle Dual-Write (somente Admin) -->
-    <div id="dualWriteMenu" style="display: none; position: fixed; bottom: 100px; right: 30px; z-index: 997;">
-        <div style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 15px; padding: 15px; box-shadow: var(--shadow-xl); border: 1px solid var(--glass-border); min-width: 200px;">
-            <h4 style="margin-bottom: 10px; color: var(--gray-700); font-size: 14px;">🌐 Modo de Conexão</h4>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <button onclick="alterarModoConexao('dual')" 
-                        style="padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 8px; background: white; color: var(--gray-700); font-size: 12px; cursor: pointer;"
-                        id="btn-dual">
-                    🌐 DUAL (Recomendado)
-                </button>
-                <button onclick="alterarModoConexao('supabase')" 
-                        style="padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 8px; background: white; color: var(--gray-700); font-size: 12px; cursor: pointer;"
-                        id="btn-supabase">
-                    ☁️ Somente Supabase
-                </button>
-                <button onclick="alterarModoConexao('jsonbin')" 
-                        style="padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 8px; background: white; color: var(--gray-700); font-size: 12px; cursor: pointer;"
-                        id="btn-jsonbin">
-                    📦 Somente JSONBin
-                </button>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gray-200);">
-                <button onclick="verificarStatusConexao()" 
-                        style="width: 100%; padding: 8px; background: var(--primary-gradient); color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer;">
-                    🔄 Verificar Status
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Botão para mostrar menu -->
-    <button id="toggleDualWriteMenu" style="position: fixed; bottom: 160px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; box-shadow: var(--shadow-xl); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 996;"
+    <button id="toggleDualWriteMenu" style="position: fixed; bottom: 160px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; box-shadow: var(--shadow-xl); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 996; display: none;"
             onclick="toggleDualWriteMenu()">
         ⚙️
     </button>
@@ -2587,7 +2557,7 @@
                     <div class="dot"></div>
                 </div>
             </div>
-            <button class="sync-btn" onclick="verificarStatusConexao(); carregarPets(true)">
+            <button class="sync-btn" onclick="carregarPets(true)">
                 <span>Atualizar</span>
             </button>
         </div>
@@ -2699,7 +2669,7 @@
     </div>
 
     <script>
-        // ========== SISTEMA DE LICENÇA AUTOMÁTICO (MODIFICADO PARA DUAL-WRITE) ==========
+        // ========== SISTEMA DE LICENÇA AUTOMÁTICO ==========
         class AutoLicenseValidator {
             constructor() {
                 this.SUPABASE_URL = "https://awirsiozohdgmmplugcl.supabase.co";
@@ -3179,29 +3149,18 @@
             }
         }
 
-        // ========== CONFIGURAÇÃO DUAL-WRITE ==========
-        const JSONBIN_CONFIG = {
-            BIN_ID: '695de16743b1c97be91e7eeb',
-            API_KEY: '$2a$10$Wmft46BmqMcXpiI3zbasQ.4xVnNwAtOSxia383nb1GxXxojFbX.Nm',
-            API_URL: 'https://api.jsonbin.io/v3/b'
-        };
-
-        const DUAL_WRITE_CONFIG = {
-            modo: 'dual', // 'dual', 'supabase', 'jsonbin'
-            timeoutSupabase: 5000, // 5 segundos
-            tentativasSupabase: 2,
-            fallbackAutomatico: true,
-            logConexao: true,
-            
-            // ATENÇÃO: Substitua 'CLIENTE_ID_AQUI' pelo ID real do cliente do seu Supabase
-            CLIENTE_ID_PADRAO: 'CLIENTE_ID_AQUI' // ⚠️ SUBSTITUIR COM ID REAL
+        // ========== CONFIGURAÇÃO SUPABASE ==========
+        const SUPABASE_CONFIG = {
+            url: 'https://awirsiozohdgmmplugcl.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc',
+            cliente_id: 'CLIENTE_ID_AQUI' // ⚠️ SUBSTITUIR COM ID REAL DO CLIENTE
         };
 
         // Cliente Supabase para operações CRUD
         class SupabaseClient {
             constructor() {
-                this.url = 'https://awirsiozohdgmmplugcl.supabase.co';
-                this.key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJzaW96b2hkZ21tcGx1Z2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NDM3MzYsImV4cCI6MjA4NDMxOTczNn0.plnaxBRj5TrrVctA6RwqRVXTJR62RMZG0GHnfhrX4xc';
+                this.url = SUPABASE_CONFIG.url;
+                this.key = SUPABASE_CONFIG.key;
                 this.headers = {
                     'apikey': this.key,
                     'Authorization': `Bearer ${this.key}`,
@@ -3226,60 +3185,47 @@
                     
                     this.conexaoAtiva = response.ok || response.status === 404;
                     
-                    if (DUAL_WRITE_CONFIG.logConexao) {
-                        console.log(`🌐 Supabase: ${this.conexaoAtiva ? '✅ Conectado' : '❌ Offline'}`);
-                    }
+                    console.log(`🌐 Supabase: ${this.conexaoAtiva ? '✅ Conectado' : '❌ Offline'}`);
                     
                 } catch (error) {
                     this.conexaoAtiva = false;
-                    if (DUAL_WRITE_CONFIG.logConexao) {
-                        console.log('🌐 Supabase: ❌ Erro de conexão', error.message);
-                    }
+                    console.log('🌐 Supabase: ❌ Erro de conexão', error.message);
                 }
             }
             
             async query(endpoint, options = {}) {
-                for (let attempt = 1; attempt <= DUAL_WRITE_CONFIG.tentativasSupabase; attempt++) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), DUAL_WRITE_CONFIG.timeoutSupabase);
-                        
-                        const response = await fetch(`${this.url}/${endpoint}`, {
-                            ...options,
-                            headers: {
-                                ...this.headers,
-                                ...options.headers
-                            },
-                            signal: controller.signal
-                        });
-                        
-                        clearTimeout(timeoutId);
-                        
-                        if (!response.ok) {
-                            if (response.status === 404 && endpoint.includes('pets')) {
-                                // Tabela vazia é OK
-                                return [];
-                            }
-                            throw new Error(`Supabase: ${response.status}`);
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    
+                    const response = await fetch(`${this.url}/${endpoint}`, {
+                        ...options,
+                        headers: {
+                            ...this.headers,
+                            ...options.headers
+                        },
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        if (response.status === 404 && endpoint.includes('pets')) {
+                            // Tabela vazia é OK
+                            return [];
                         }
-                        
-                        if (response.status === 204 || response.headers.get('content-length') === '0') {
-                            return null;
-                        }
-                        
-                        return await response.json();
-                        
-                    } catch (error) {
-                        if (DUAL_WRITE_CONFIG.logConexao && attempt === 1) {
-                            console.warn(`🌐 Supabase tentativa ${attempt} falhou:`, error.message);
-                        }
-                        
-                        if (attempt === DUAL_WRITE_CONFIG.tentativasSupabase) {
-                            throw error;
-                        }
-                        
-                        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                        throw new Error(`Supabase: ${response.status}`);
                     }
+                    
+                    if (response.status === 204 || response.headers.get('content-length') === '0') {
+                        return null;
+                    }
+                    
+                    return await response.json();
+                    
+                } catch (error) {
+                    console.warn('🌐 Supabase falhou:', error.message);
+                    throw error;
                 }
             }
         }
@@ -3305,90 +3251,6 @@
             qrcodeBackup: 'https://imgur.com/paZK1Tx'
         };
 
-        // ========== FUNÇÕES DE CONTROLE DUAL-WRITE ==========
-        function alterarModoConexao(modo) {
-            DUAL_WRITE_CONFIG.modo = modo;
-            
-            // Atualizar botões
-            const buttons = {
-                'dual': document.getElementById('btn-dual'),
-                'supabase': document.getElementById('btn-supabase'),
-                'jsonbin': document.getElementById('btn-jsonbin')
-            };
-            
-            // Resetar todos os botões
-            Object.values(buttons).forEach(btn => {
-                if (btn) {
-                    btn.style.background = 'white';
-                    btn.style.color = 'var(--gray-700)';
-                    btn.style.borderColor = 'var(--gray-200)';
-                }
-            });
-            
-            // Estilizar botão ativo
-            if (buttons[modo]) {
-                const colors = {
-                    'dual': { bg: 'var(--primary-gradient)', color: 'white', border: 'var(--primary)' },
-                    'supabase': { bg: 'var(--success-gradient)', color: 'white', border: 'var(--success)' },
-                    'jsonbin': { bg: 'var(--warning-gradient)', color: 'white', border: 'var(--warning)' }
-                };
-                
-                buttons[modo].style.background = colors[modo].bg;
-                buttons[modo].style.color = colors[modo].color;
-                buttons[modo].style.borderColor = colors[modo].border;
-            }
-            
-            switch(modo) {
-                case 'dual':
-                    mostrarMensagem('🌐 Modo DUAL ativado (Supabase + JSONBin)', 'info');
-                    break;
-                case 'supabase':
-                    mostrarMensagem('☁️ Modo SUPABASE ativado', 'success');
-                    break;
-                case 'jsonbin':
-                    mostrarMensagem('📦 Modo JSONBIN ativado', 'warning');
-                    break;
-            }
-            
-            // Salvar preferência
-            localStorage.setItem('pst_modo_conexao', modo);
-            
-            // Recarregar dados no novo modo
-            carregarPets(true);
-        }
-
-        function verificarStatusConexao() {
-            const status = {
-                supabase: supabase.conexaoAtiva ? '✅ Conectado' : '❌ Offline',
-                jsonbin: '✅ Disponível',
-                modo: DUAL_WRITE_CONFIG.modo,
-                totalPets: pets.length,
-                recomendacao: ''
-            };
-            
-            if (!supabase.conexaoAtiva && DUAL_WRITE_CONFIG.modo === 'supabase') {
-                status.recomendacao = '⚠️ Supabase offline, altere para modo DUAL ou JSONBIN';
-            }
-            
-            mostrarMensagem(
-                `🌐 Status: Supabase ${status.supabase} | Modo: ${status.modo} | Pets: ${status.totalPets}`,
-                supabase.conexaoAtiva ? 'success' : 'warning'
-            );
-            
-            return status;
-        }
-
-        function toggleDualWriteMenu() {
-            const menu = document.getElementById('dualWriteMenu');
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Carregar preferência salva
-        const modoSalvo = localStorage.getItem('pst_modo_conexao');
-        if (modoSalvo && ['dual', 'supabase', 'jsonbin'].includes(modoSalvo)) {
-            DUAL_WRITE_CONFIG.modo = modoSalvo;
-        }
-
         // ========== FUNÇÕES BÁSICAS ==========
         function configurarInterface() {
             const addBtn = document.getElementById('addBtn');
@@ -3406,9 +3268,6 @@
                 visualCounters.style.display = 'flex';
                 adminButtons.style.display = 'flex';
                 searchContainer.style.display = 'none';
-                
-                // Mostrar menu dual-write apenas para admin
-                document.getElementById('toggleDualWriteMenu').style.display = 'flex';
             } else {
                 addBtn.classList.remove('visible');
                 userBadge.textContent = 'Motorista';
@@ -3417,16 +3276,7 @@
                 visualCounters.style.display = 'flex';
                 adminButtons.style.display = 'none';
                 searchContainer.style.display = 'block';
-                
-                // Esconder menu dual-write para motorista
-                document.getElementById('toggleDualWriteMenu').style.display = 'none';
-                document.getElementById('dualWriteMenu').style.display = 'none';
             }
-            
-            // Aplicar estilo ao botão ativo
-            setTimeout(() => {
-                alterarModoConexao(DUAL_WRITE_CONFIG.modo);
-            }, 100);
         }
 
         function mostrarFormulario() {
@@ -3558,11 +3408,11 @@
             }
         }
 
-        // ========== FUNÇÕES DUAL-WRITE PARA CARREGAR E SALVAR ==========
+        // ========== FUNÇÕES SUPABASE PARA CARREGAR E SALVAR ==========
         async function carregarPets(forcarSync = false) {
             try {
-                // 1. Tentar carregar do Supabase primeiro
-                if (DUAL_WRITE_CONFIG.modo !== 'jsonbin' && supabase.conexaoAtiva) {
+                // 1. Tentar carregar do Supabase
+                if (supabase.conexaoAtiva) {
                     try {
                         // Carregar pets do Supabase
                         const petsSupabase = await supabase.query('rest/v1/pets?select=*&order=created_at.desc');
@@ -3572,7 +3422,7 @@
                             pets = petsSupabase.map(pet => ({
                                 id: pet.id || Date.now() + Math.random(),
                                 supabase_id: pet.id, // Guardar ID do Supabase
-                                clienteId: pet.cliente_id || DUAL_WRITE_CONFIG.CLIENTE_ID_PADRAO,
+                                clienteId: pet.cliente_id || SUPABASE_CONFIG.cliente_id,
                                 cliente: pet.cliente_nome || 'Cliente não informado',
                                 nomePet: pet.nome_pet || 'Pet sem nome',
                                 raca: pet.raca || '',
@@ -3595,12 +3445,7 @@
                                 pagamentoCollapsed: true
                             }));
                             
-                            if (DUAL_WRITE_CONFIG.logConexao) {
-                                console.log(`✅ Carregados ${pets.length} pets do Supabase`);
-                            }
-                            
-                            // Salvar backup no JSONBin em segundo plano
-                            setTimeout(() => salvarBackupJSONBin(), 1000);
+                            console.log(`✅ Carregados ${pets.length} pets do Supabase`);
                             
                             await mostrarPets();
                             atualizarHora();
@@ -3613,52 +3458,19 @@
                             }
                             
                             return;
+                        } else {
+                            pets = [];
                         }
                         
                     } catch (error) {
-                        if (DUAL_WRITE_CONFIG.logConexao) {
-                            console.warn('❌ Erro ao carregar do Supabase:', error.message);
-                        }
+                        console.warn('❌ Erro ao carregar do Supabase:', error.message);
                     }
                 }
                 
-                // 2. Fallback para JSONBin
-                if (DUAL_WRITE_CONFIG.modo !== 'supabase') {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 5000);
-                        
-                        const response = await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}/latest`, {
-                            headers: { 'X-Master-Key': JSONBIN_CONFIG.API_KEY },
-                            cache: forcarSync ? 'no-cache' : 'default',
-                            signal: controller.signal
-                        });
-                        
-                        clearTimeout(timeoutId);
-                        
-                        const data = await response.json();
-                        pets = data.record?.pets || [];
-                        
-                        if (DUAL_WRITE_CONFIG.logConexao) {
-                            console.log(`🔄 Carregados ${pets.length} pets do JSONBin (fallback)`);
-                        }
-                        
-                        // Sincronizar com Supabase em segundo plano
-                        if (supabase.conexaoAtiva && pets.length > 0) {
-                            setTimeout(() => sincronizarParaSupabase(), 2000);
-                        }
-                        
-                    } catch (error) {
-                        console.log('📦 Usando dados locais do localStorage');
-                        const local = localStorage.getItem('meusPets');
-                        pets = local ? JSON.parse(local) : [];
-                    }
-                } else {
-                    // Modo somente Supabase mas falhou
-                    console.log('📦 Usando dados locais do localStorage');
-                    const local = localStorage.getItem('meusPets');
-                    pets = local ? JSON.parse(local) : [];
-                }
+                // 2. Fallback para localStorage se Supabase falhar
+                console.log('📦 Usando dados locais do localStorage');
+                const local = localStorage.getItem('meusPets');
+                pets = local ? JSON.parse(local) : [];
                 
                 await mostrarPets();
                 atualizarHora();
@@ -3667,10 +3479,7 @@
                 atualizarCardsVisuais();
                 
                 if (forcarSync) {
-                    mostrarMensagem(DUAL_WRITE_CONFIG.modo === 'jsonbin' ? 
-                        '✅ Dados atualizados do JSONBin!' : 
-                        '⚠️ Usando dados locais', 
-                        DUAL_WRITE_CONFIG.modo === 'jsonbin' ? 'success' : 'warning');
+                    mostrarMensagem('⚠️ Usando dados locais', 'warning');
                 }
                 
             } catch (error) {
@@ -3679,133 +3488,18 @@
             }
         }
 
-        // Função para salvar backup no JSONBin
-        async function salvarBackupJSONBin() {
-            try {
-                if (pets.length === 0) return;
-                
-                const dadosParaSalvar = { pets };
-                await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(dadosParaSalvar)
-                });
-                
-                if (DUAL_WRITE_CONFIG.logConexao) {
-                    console.log('💾 Backup salvo no JSONBin');
-                }
-                
-            } catch (error) {
-                // Ignorar erros no backup
-            }
-        }
-
-        // Função para sincronizar dados do JSONBin para Supabase
-        async function sincronizarParaSupabase() {
-            try {
-                if (!supabase.conexaoAtiva || pets.length === 0) return;
-                
-                // Verificar se já tem pets no Supabase
-                const petsSupabase = await supabase.query('rest/v1/pets?select=id&limit=1');
-                
-                if (petsSupabase && petsSupabase.length > 0) {
-                    // Já tem dados, não sincronizar
-                    return;
-                }
-                
-                console.log('🔄 Sincronizando dados do JSONBin para Supabase...');
-                
-                // Sincronizar todos os pets
-                for (const pet of pets) {
-                    try {
-                        // ⚠️ ATENÇÃO: Precisa do CLIENTE_ID real aqui
-                        const petSupabase = {
-                            cliente_id: DUAL_WRITE_CONFIG.CLIENTE_ID_PADRAO, // SUBSTITUIR COM ID REAL
-                            cliente_nome: pet.cliente || 'Cliente não informado',
-                            nome_pet: pet.nomePet || pet.nome || 'Pet sem nome',
-                            raca: pet.raca || '',
-                            cor: pet.cor || '',
-                            endereco: pet.endereco || '',
-                            tempo: pet.tempo || '',
-                            hora_retirada: pet.horaRetirada || null,
-                            valor_pix: pet.valorPix || null,
-                            status: pet.status || '',
-                            pagamento: pet.pagamento || 'Pendente',
-                            observacoes_admin: pet.observacoesAdmin || '',
-                            observacoes_motorista: pet.observacoesMotorista || '',
-                            hora_entregue: pet.horaEntregue || null,
-                            valor_recebido: pet.valorRecebido || null,
-                            data_pagamento: pet.dataPagamento || null,
-                            arquivado: pet.arquivado || false,
-                            prioridade: pet.prioridade || null,
-                            pets_adicionais: pet.petsAdicionais || [],
-                            created_at: pet.dataCriacao || new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        };
-                        
-                        const response = await supabase.query('rest/v1/pets', {
-                            method: 'POST',
-                            body: JSON.stringify(petSupabase)
-                        });
-                        
-                        if (response && response[0]) {
-                            pet.supabase_id = response[0].id;
-                        }
-                        
-                    } catch (error) {
-                        console.warn('Erro ao sincronizar pet:', error);
-                    }
-                    
-                    // Pequena pausa para não sobrecarregar
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                }
-                
-                console.log('✅ Dados sincronizados para Supabase');
-                mostrarMensagem('✅ Dados sincronizados com Supabase!', 'success');
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                mostrarMensagem('❌ Erro ao sincronizar com Supabase', 'error');
-            }
-        }
-
         async function salvarPets() {
-            const dadosParaSalvar = { pets };
-            
-            // 1. Sempre salvar no localStorage
+            // 1. Salvar backup local
             localStorage.setItem('meusPets', JSON.stringify(pets));
             
-            // 2. Salvar no JSONBin (sempre como backup)
-            try {
-                await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(dadosParaSalvar)
-                });
-                
-                if (DUAL_WRITE_CONFIG.logConexao) {
-                    console.log('💾 Dados salvos no JSONBin');
-                }
-                
-            } catch (error) {
-                console.warn('❌ Erro ao salvar no JSONBin:', error);
-            }
-            
-            // 3. Tentar salvar no Supabase (se conectado)
-            if (DUAL_WRITE_CONFIG.modo !== 'jsonbin' && supabase.conexaoAtiva) {
+            // 2. Tentar salvar no Supabase (se conectado)
+            if (supabase.conexaoAtiva) {
                 try {
                     // Para cada pet, verificar se já existe no Supabase
                     for (const pet of pets) {
                         try {
-                            // ⚠️ ATENÇÃO: Precisa do CLIENTE_ID real aqui
                             const petSupabase = {
-                                cliente_id: DUAL_WRITE_CONFIG.CLIENTE_ID_PADRAO, // SUBSTITUIR COM ID REAL
+                                cliente_id: SUPABASE_CONFIG.cliente_id,
                                 cliente_nome: pet.cliente || 'Cliente não informado',
                                 nome_pet: pet.nomePet || pet.nome || 'Pet sem nome',
                                 raca: pet.raca || '',
@@ -3854,9 +3548,7 @@
                         }
                     }
                     
-                    if (DUAL_WRITE_CONFIG.logConexao) {
-                        console.log('✅ Dados sincronizados com Supabase');
-                    }
+                    console.log('✅ Dados sincronizados com Supabase');
                     
                 } catch (error) {
                     console.warn('❌ Erro ao sincronizar com Supabase:', error);
@@ -3866,18 +3558,7 @@
             return true;
         }
 
-        // ========== CONTINUAÇÃO DO CÓDIGO (mantendo as funções originais) ==========
-        // [O restante do seu código JavaScript original permanece aqui...]
-        // Incluindo: aplicarOrdenacaoDinamicaCorrigida, mostrarProximaRetirada,
-        // atualizarCardsVisuais, filtrarPets, atualizarHistoricoEntregas,
-        // mostrarModalPix, habilitarEdicao, adicionarPet, atualizarPetStatus,
-        // definirPrioridade, atualizarObservacoes, adminMarcarComoPago,
-        // removerPet, copiarEndereco, zerarPetsEntregues, mostrarModalLimpeza,
-        // confirmarLimpeza, mostrarPets, formatarValor, mostrarMensagem,
-        // atualizarHora, togglePagamento, marcarComoPago, marcarComoNaoPago,
-        // mostrarPetsComOrdem, e as funções de inicialização.
-
-        // ========== ORDENAÇÃO DINÂMICA ==========
+        // ========== CONTINUAÇÃO DO CÓDIGO ==========
         function aplicarOrdenacaoDinamicaCorrigida() {
             if (isReordering) return;
             isReordering = true;
@@ -3928,13 +3609,12 @@
             return novaOrdem;
         }
 
-        // ========== PRÓXIMA RETIRADA - CORREÇÃO COMPLETA ==========
         function mostrarProximaRetirada() {
             const highlight = document.getElementById('nextPickupHighlight');
             const agora = new Date();
             const horaAtual = agora.getHours() * 60 + agora.getMinutes();
             
-            // 🔥 1. PETS POR HORÁRIO (próximas 2 horas)
+            // Pets por horário (próximas 2 horas)
             const petsHorarioProximo = pets.filter(p => 
                 !p.arquivado && 
                 p.status !== 'Entregue' &&
@@ -3948,14 +3628,14 @@
               .sort((a, b) => a.diferenca - b.diferenca)
               .map(item => item.pet);
             
-            // 🔥 2. PETS AGUARDANDO RETIRADA (status vazio ou "A caminho retirada")
+            // Pets aguardando retirada
             const petsAguardando = pets.filter(p => 
                 !p.arquivado && 
                 p.status !== 'Entregue' &&
                 (p.status === '' || p.status === 'A caminho retirada')
             );
             
-            // 🔥 3. PETS COM PRIORIDADE ALTA
+            // Pets com prioridade alta
             const petsPrioridadeAlta = pets.filter(p => 
                 !p.arquivado && 
                 p.prioridade === 'alta' 
@@ -3965,8 +3645,7 @@
             const todosPetsProximaRetirada = [];
             const idsAdicionados = new Set();
             
-            // Adicionar por ordem de prioridade:
-            // 1. Horário próximo
+            // Adicionar por ordem de prioridade
             petsHorarioProximo.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -3974,7 +3653,6 @@
                 }
             });
             
-            // 2. Prioridade alta
             petsPrioridadeAlta.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -3982,7 +3660,6 @@
                 }
             });
             
-            // 3. Aguardando retirada
             petsAguardando.forEach(pet => {
                 if (!idsAdicionados.has(pet.id)) {
                     todosPetsProximaRetirada.push(pet);
@@ -4025,7 +3702,6 @@
             }
         }
 
-        // ========== CARDS VISUAIS RECOLHÍVEIS ==========
         function atualizarCardsVisuais() {
             const visualCounters = document.getElementById('visualCounters');
             
@@ -4237,7 +3913,6 @@
             }
         }
 
-        // ========== FILTRO DE BUSCA ==========
         function filtrarPets(termo) {
             const searchResults = document.getElementById('searchResults');
             
@@ -4277,7 +3952,6 @@
             searchResults.classList.add('visible');
         }
 
-        // ========== HISTÓRICO DE ENTREGAS ==========
         function toggleDeliveredSidebar() {
             const sidebar = document.getElementById('deliveredSidebar');
             sidebar.classList.toggle('active');
@@ -4325,7 +3999,6 @@
             `).join('');
         }
 
-        // ========== SISTEMA PIX ==========
         function mostrarModalPix(petId) {
             const modal = document.getElementById('pixModal');
             const pixValor = document.getElementById('pixValor');
@@ -4351,7 +4024,6 @@
                 .catch(() => mostrarMensagem('❌ Erro ao copiar chave', 'error'));
         }
 
-        // ========== SISTEMA DE EDIÇÃO ==========
         function habilitarEdicao(petId) {
             if (!isAdmin) return;
             
@@ -4434,7 +4106,6 @@
             resetarFormularioMultiPet();
         }
 
-        // ========== ADICIONAR PET COM MULTI-PETS ==========
         async function adicionarPet() {
             if (!isAdmin && !editingPetId) return;
             
@@ -4504,7 +4175,7 @@
                     const pet = {
                         id: clienteId + index,
                         supabase_id: null, // Será preenchido ao salvar no Supabase
-                        clienteId: DUAL_WRITE_CONFIG.CLIENTE_ID_PADRAO, // Usando cliente padrão
+                        clienteId: SUPABASE_CONFIG.cliente_id,
                         cliente: cliente,
                         nomePet: petData.nomePet,
                         raca: petData.raca,
@@ -4542,7 +4213,6 @@
             mostrarMensagem(`✅ ${todosPets.length} pet(s) adicionado(s) com sucesso!`, 'success');
         }
 
-        // ========== ATUALIZAR STATUS DO PET ==========
         async function atualizarPetStatus(petId, campo, valor) {
             const pet = pets.find(p => p.id === petId);
             if (!pet) return;
@@ -4609,7 +4279,6 @@
             atualizarCardsVisuais();
         }
 
-        // ========== FUNÇÕES DE PRIORIDADE ==========
         function definirPrioridade(petId, prioridade) {
             const pet = pets.find(p => p.id === petId);
             if (!pet) return;
@@ -4637,7 +4306,6 @@
             mostrarMensagem('✅ Observação salva!', 'success');
         }
 
-        // ========== ADMIN MARCAR COMO PAGO ==========
         async function adminMarcarComoPago(petId) {
             const pet = pets.find(p => p.id === petId);
             if (!pet) return;
@@ -4682,7 +4350,6 @@
                 .catch(() => mostrarMensagem('❌ Erro ao copiar', 'error'));
         }
 
-        // ========== ZERAR PETS ENTREGUES ==========
         async function zerarPetsEntregues() {
             if (!isAdmin) return;
             
@@ -4710,7 +4377,6 @@
             mostrarMensagem(`✅ ${petsEntregues.length} pet(s) entregue(s) arquivados com sucesso!`, 'success');
         }
 
-        // ========== LIMPAR BANCO DE DADOS ==========
         function mostrarModalLimpeza() {
             if (!isAdmin) return;
             
@@ -4738,17 +4404,19 @@
             
             pets = [];
             
-            try {
-                await fetch(`${JSONBIN_CONFIG.API_URL}/${JSONBIN_CONFIG.BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ pets: [] })
-                });
-            } catch (error) {
-                console.error('Erro ao limpar JSONBin:', error);
+            // Limpar Supabase também
+            if (supabase.conexaoAtiva) {
+                try {
+                    await supabase.query('rest/v1/pets', {
+                        method: 'DELETE',
+                        headers: {
+                            ...supabase.headers,
+                            'Prefer': 'return=minimal'
+                        }
+                    });
+                } catch (error) {
+                    console.error('Erro ao limpar Supabase:', error);
+                }
             }
             
             localStorage.removeItem('meusPets');
@@ -4762,7 +4430,6 @@
             mostrarMensagem('✅ Banco de dados limpo com sucesso!', 'success');
         }
 
-        // ========== RENDERIZAR PETS ==========
         async function mostrarPets() {
             const container = document.getElementById('petsList');
             
@@ -5015,7 +4682,6 @@
             atualizarHora();
         }
 
-        // ========== UTILITÁRIOS ==========
         function formatarValor(input) {
             let valor = input.value.replace(/\D/g, '');
             valor = (parseInt(valor) / 100).toFixed(2);
@@ -5121,6 +4787,29 @@
             await salvarPets();
             mostrarPets();
             mostrarMensagem(`❌ ${pet.nomePet} marcado como NÃO PAGO e arquivado!`, 'warning');
+        }
+
+        function confirmarValorRecebido(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            const valorInput = document.querySelector(`#valorRecebido-${petId} .valor-input`);
+            const valor = parseFloat(valorInput.value.replace(',', '.'));
+            
+            if (isNaN(valor) || valor <= 0) {
+                mostrarMensagem('⚠️ Digite um valor válido!', 'warning');
+                return;
+            }
+            
+            pet.valorRecebido = valor;
+            pet.pagamento = 'Pago';
+            pet.dataPagamento = new Date().toISOString();
+            pet.arquivado = true;
+            
+            salvarPets();
+            mostrarPets();
+            
+            mostrarMensagem(`✅ Valor de R$ ${valor.toFixed(2).replace('.', ',')} registrado! Pet arquivado.`, 'success');
         }
 
         // ========== INICIAR ==========
@@ -5246,6 +4935,11 @@
 
         async function mostrarPetsComOrdem(petsOrdenados) {
             await mostrarPets();
+        }
+
+        // Removida função toggleDualWriteMenu pois não é mais necessária
+        function toggleDualWriteMenu() {
+            // Função removida - sistema dual-write foi eliminado
         }
     </script>
 </body>
