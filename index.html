@@ -2558,8 +2558,9 @@
                 </div>
             </div>
             <button class="sync-btn" onclick="sincronizarManual()" id="syncButton">
-    <span>Atualizar</span>
-</button>
+                <span>Atualizar</span>
+            </button>
+        </div>
         
         <!-- Área de Destaque Próxima Retirada -->
         <div class="next-pickup-highlight" id="nextPickupHighlight" style="display: none;">
@@ -3409,118 +3410,247 @@
 
         // ========== FUNÇÕES SUPABASE PARA CARREGAR E SALVAR ==========
         async function carregarPets(forcarSync = false) {
-    try {
-        console.log('🔄 Iniciando carregamento de pets...');
-        
-        // PRIMEIRO: Tentar carregar do localStorage (para ter algo imediatamente)
-        const localData = localStorage.getItem('meusPets');
-        if (localData) {
-            pets = JSON.parse(localData);
-            console.log(`📦 Carregados ${pets.length} pets do localStorage`);
-            await mostrarPets();
-        }
-        
-        // DEPOIS: Tentar sincronizar com Supabase em segundo plano
-        setTimeout(async () => {
             try {
-                console.log('🌐 Tentando conexão com Supabase...');
+                console.log('🔄 Iniciando carregamento de pets...');
                 
-                // Testar conexão primeiro
-                const testResponse = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets?limit=1`, {
-                    headers: {
-                        'apikey': SUPABASE_CONFIG.key,
-                        'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
-                    }
-                });
-                
-                if (!testResponse.ok) {
-                    console.warn('⚠️ Supabase respondeu com erro:', testResponse.status);
-                    return;
+                // PRIMEIRO: Tentar carregar do localStorage (para ter algo imediatamente)
+                const localData = localStorage.getItem('meusPets');
+                if (localData) {
+                    pets = JSON.parse(localData);
+                    console.log(`📦 Carregados ${pets.length} pets do localStorage`);
+                    await mostrarPets();
                 }
                 
-                console.log('✅ Conexão com Supabase OK, carregando dados...');
-                
-                // Carregar todos os pets
-                const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets?select=*&order=created_at.desc`, {
-                    headers: {
-                        'apikey': SUPABASE_CONFIG.key,
-                        'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const petsSupabase = await response.json();
-                    console.log(`📊 Supabase retornou: ${petsSupabase?.length || 0} pets`);
-                    
-                    if (petsSupabase && petsSupabase.length > 0) {
-                        // Converter formato
-                        const novosPets = petsSupabase.map(pet => ({
-                            id: pet.id || Date.now() + Math.random(),
-                            supabase_id: pet.id,
-                            clienteId: pet.cliente_id || SUPABASE_CONFIG.cliente_id,
-                            cliente: pet.cliente_nome || 'Cliente não informado',
-                            nomePet: pet.nome_pet || 'Pet sem nome',
-                            raca: pet.raca || '',
-                            cor: pet.cor || '',
-                            endereco: pet.endereco || '',
-                            tempo: pet.tempo || '',
-                            horaRetirada: pet.hora_retirada || '',
-                            valorPix: pet.valor_pix || 50.00,
-                            status: pet.status || '',
-                            pagamento: pet.pagamento || 'Pendente',
-                            observacoesAdmin: pet.observacoes_admin || '',
-                            observacoesMotorista: pet.observacoes_motorista || '',
-                            horaEntregue: pet.hora_entregue || null,
-                            valorRecebido: pet.valor_recebido || null,
-                            dataPagamento: pet.data_pagamento || null,
-                            arquivado: pet.arquivado || false,
-                            prioridade: pet.prioridade || null,
-                            petsAdicionais: pet.pets_adicionais || [],
-                            dataCriacao: pet.created_at || new Date().toISOString(),
-                            pagamentoCollapsed: true
-                        }));
+                // DEPOIS: Tentar sincronizar com Supabase em segundo plano
+                setTimeout(async () => {
+                    try {
+                        console.log('🌐 Tentando conexão com Supabase...');
                         
-                        // Atualizar apenas se houver diferença
-                        if (JSON.stringify(pets) !== JSON.stringify(novosPets)) {
-                            pets = novosPets;
-                            localStorage.setItem('meusPets', JSON.stringify(pets));
-                            console.log(`✅ Atualizados ${pets.length} pets do Supabase`);
-                            
-                            // Atualizar interface
-                            await mostrarPets();
-                            mostrarProximaRetirada();
-                            atualizarHistoricoEntregas();
-                            atualizarCardsVisuais();
-                            
-                            if (forcarSync) {
-                                mostrarMensagem('✅ Dados sincronizados do Supabase!', 'success');
+                        // Testar conexão primeiro
+                        const testResponse = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets?limit=1`, {
+                            headers: {
+                                'apikey': SUPABASE_CONFIG.key,
+                                'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
                             }
+                        });
+                        
+                        if (!testResponse.ok) {
+                            console.warn('⚠️ Supabase respondeu com erro:', testResponse.status);
+                            return;
                         }
-                    } else {
-                        console.log('📭 Supabase vazio, mantendo dados locais');
+                        
+                        console.log('✅ Conexão com Supabase OK, carregando dados...');
+                        
+                        // Carregar todos os pets
+                        const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets?cliente_id=eq.${SUPABASE_CONFIG.cliente_id}&select=*&order=created_at.desc`, {
+                            headers: {
+                                'apikey': SUPABASE_CONFIG.key,
+                                'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const petsSupabase = await response.json();
+                            console.log(`📊 Supabase retornou: ${petsSupabase?.length || 0} pets`);
+                            
+                            if (petsSupabase && petsSupabase.length > 0) {
+                                // Converter formato
+                                const novosPets = petsSupabase.map(pet => ({
+                                    id: pet.id || Date.now() + Math.random(),
+                                    supabase_id: pet.id,
+                                    clienteId: pet.cliente_id || SUPABASE_CONFIG.cliente_id,
+                                    cliente: pet.cliente_nome || 'Cliente não informado',
+                                    nomePet: pet.nome_pet || 'Pet sem nome',
+                                    raca: pet.raca || '',
+                                    cor: pet.cor || '',
+                                    endereco: pet.endereco || '',
+                                    tempo: pet.tempo || '',
+                                    horaRetirada: pet.hora_retirada || '',
+                                    valorPix: pet.valor_pix || 50.00,
+                                    status: pet.status || '',
+                                    pagamento: pet.pagamento || 'Pendente',
+                                    observacoesAdmin: pet.observacoes_admin || '',
+                                    observacoesMotorista: pet.observacoes_motorista || '',
+                                    horaEntregue: pet.hora_entregue || null,
+                                    valorRecebido: pet.valor_recebido || null,
+                                    dataPagamento: pet.data_pagamento || null,
+                                    arquivado: pet.arquivado || false,
+                                    prioridade: pet.prioridade || null,
+                                    petsAdicionais: pet.pets_adicionais ? JSON.parse(pet.pets_adicionais) : [],
+                                    dataCriacao: pet.created_at || new Date().toISOString(),
+                                    pagamentoCollapsed: true
+                                }));
+                                
+                                // Atualizar apenas se houver diferença
+                                if (JSON.stringify(pets) !== JSON.stringify(novosPets)) {
+                                    pets = novosPets;
+                                    localStorage.setItem('meusPets', JSON.stringify(pets));
+                                    console.log(`✅ Atualizados ${pets.length} pets do Supabase`);
+                                    
+                                    // Atualizar interface
+                                    await mostrarPets();
+                                    mostrarProximaRetirada();
+                                    atualizarHistoricoEntregas();
+                                    atualizarCardsVisuais();
+                                    
+                                    if (forcarSync) {
+                                        mostrarMensagem('✅ Dados sincronizados do Supabase!', 'success');
+                                    }
+                                }
+                            } else {
+                                console.log('📭 Supabase vazio, mantendo dados locais');
+                            }
+                        } else {
+                            console.warn('❌ Supabase retornou erro:', response.status);
+                        }
+                        
+                    } catch (error) {
+                        console.warn('🌐 Erro na sincronização Supabase:', error.message);
+                        // Não mostrar erro para o usuário, apenas usar dados locais
                     }
+                }, 1000); // Aguardar 1 segundo antes de sincronizar
+                
+                // Atualizar interface imediatamente com dados locais
+                atualizarHora();
+                mostrarProximaRetirada();
+                atualizarHistoricoEntregas();
+                atualizarCardsVisuais();
+                
+            } catch (error) {
+                console.error('❌ Erro crítico ao carregar pets:', error);
+                // Não mostrar erro para não assustar o usuário
+            }
+        }
+
+        // ========== FUNÇÕES DE SALVAMENTO NO SUPABASE ==========
+        async function salvarPets() {
+            console.log('💾 Salvando pets...', pets.length);
+            
+            try {
+                // 1. Salvar no localStorage (backup local)
+                localStorage.setItem('meusPets', JSON.stringify(pets));
+                console.log('✅ Pets salvos no localStorage:', pets.length);
+                
+                // 2. Salvar no Supabase (se conectado)
+                if (supabase?.conexaoAtiva) {
+                    let sucessos = 0;
+                    for (const pet of pets) {
+                        const sucesso = await salvarPetIndividualSupabase(pet);
+                        if (sucesso) sucessos++;
+                    }
+                    console.log(`✅ ${sucessos}/${pets.length} pets sincronizados com Supabase`);
+                    return true;
                 } else {
-                    console.warn('❌ Supabase retornou erro:', response.status);
+                    console.log('⚠️ Supabase offline, salvando apenas local');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar pets:', error);
+                return false;
+            }
+        }
+
+        async function salvarPetIndividualSupabase(pet) {
+            try {
+                const petData = {
+                    id: pet.supabase_id || pet.id,
+                    cliente_id: SUPABASE_CONFIG.cliente_id,
+                    cliente_nome: pet.cliente,
+                    nome_pet: pet.nomePet,
+                    raca: pet.raca,
+                    cor: pet.cor,
+                    endereco: pet.endereco,
+                    tempo: pet.tempo,
+                    hora_retirada: pet.horaRetirada,
+                    valor_pix: pet.valorPix,
+                    status: pet.status,
+                    pagamento: pet.pagamento,
+                    observacoes_admin: pet.observacoesAdmin,
+                    observacoes_motorista: pet.observacoesMotorista,
+                    hora_entregue: pet.horaEntregue,
+                    valor_recebido: pet.valorRecebido,
+                    data_pagamento: pet.dataPagamento,
+                    arquivado: pet.arquivado,
+                    prioridade: pet.prioridade,
+                    pets_adicionais: JSON.stringify(pet.petsAdicionais || []),
+                    created_at: pet.dataCriacao || new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                // Primeiro tenta atualizar (se já existe)
+                const updateResponse = await fetch(
+                    `${SUPABASE_CONFIG.url}/rest/v1/pets?id=eq.${pet.supabase_id || pet.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.key,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.key}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(petData)
+                    }
+                );
+
+                if (!updateResponse.ok || updateResponse.status === 404) {
+                    // Se não existe, cria novo
+                    const createResponse = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/pets`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.key,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.key}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(petData)
+                    });
+
+                    if (createResponse.ok) {
+                        const data = await createResponse.json();
+                        if (data && data[0]) {
+                            pet.supabase_id = data[0].id;
+                        }
+                        return true;
+                    } else {
+                        console.warn('❌ Erro ao criar pet no Supabase');
+                        return false;
+                    }
+                }
+
+                return true;
+            } catch (error) {
+                console.warn('⚠️ Erro ao salvar pet no Supabase:', error);
+                return false;
+            }
+        }
+
+        // ========== FUNÇÃO DE SINCRONIZAÇÃO MANUAL ==========
+        async function sincronizarManual() {
+            const syncBtn = document.getElementById('syncButton');
+            const originalText = syncBtn.innerHTML;
+            
+            try {
+                syncBtn.innerHTML = '🔄 Sincronizando...';
+                syncBtn.disabled = true;
+                
+                // 1. Primeiro salva local → Supabase
+                const salvou = await salvarPets();
+                
+                if (salvou) {
+                    // 2. Depois recarrega do Supabase (para pegar atualizações de outros dispositivos)
+                    await carregarPets(true);
+                    mostrarMensagem('✅ Sincronização completa!', 'success');
+                } else {
+                    mostrarMensagem('⚠️ Sincronização parcial (modo offline)', 'warning');
                 }
                 
             } catch (error) {
-                console.warn('🌐 Erro na sincronização Supabase:', error.message);
-                // Não mostrar erro para o usuário, apenas usar dados locais
+                console.error('❌ Erro na sincronização:', error);
+                mostrarMensagem('❌ Erro na sincronização', 'error');
+            } finally {
+                syncBtn.innerHTML = originalText;
+                syncBtn.disabled = false;
             }
-        }, 1000); // Aguardar 1 segundo antes de sincronizar
-        
-        // Atualizar interface imediatamente com dados locais
-        atualizarHora();
-        mostrarProximaRetirada();
-        atualizarHistoricoEntregas();
-        atualizarCardsVisuais();
-        
-    } catch (error) {
-        console.error('❌ Erro crítico ao carregar pets:', error);
-        // Não mostrar erro para não assustar o usuário
-        // mostrarMensagem('⚠️ Usando dados locais', 'info');
-    }
-}
+        }
 
         // ========== CONTINUAÇÃO DO CÓDIGO ==========
         function aplicarOrdenacaoDinamicaCorrigida() {
@@ -4166,7 +4296,7 @@
                 });
             }
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             await mostrarPets();
             mostrarProximaRetirada();
             atualizarHistoricoEntregas();
@@ -4214,7 +4344,7 @@
                 }
             }
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             
             if (campo === 'status' && valor !== 'Entregue') {
                 const container = document.getElementById('petsList');
@@ -4248,7 +4378,7 @@
             if (!pet) return;
             
             pet.prioridade = prioridade;
-            salvarPets();
+            salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             mostrarPets();
             mostrarProximaRetirada();
             
@@ -4265,7 +4395,7 @@
                 pet.observacoesMotorista = texto;
             }
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             
             mostrarMensagem('✅ Observação salva!', 'success');
         }
@@ -4290,7 +4420,7 @@
                 mostrarMensagem(`✅ ${pet.nomePet} marcado como PAGO! Motorista ainda precisa marcar como Entregue.`, 'success');
             }
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             await mostrarPets();
             atualizarCardsVisuais();
         }
@@ -4299,7 +4429,7 @@
             if (!isAdmin || !confirm('Remover este pet?')) return;
             
             pets = pets.filter(p => p.id !== petId);
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             await mostrarPets();
             mostrarProximaRetirada();
             atualizarHistoricoEntregas();
@@ -4334,7 +4464,7 @@
                 }
             });
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             await mostrarPets();
             atualizarCardsVisuais();
             
@@ -4371,7 +4501,7 @@
             // Limpar Supabase também
             if (supabase.conexaoAtiva) {
                 try {
-                    await supabase.query('rest/v1/pets', {
+                    await supabase.query('rest/v1/pets?cliente_id=eq.' + SUPABASE_CONFIG.cliente_id, {
                         method: 'DELETE',
                         headers: {
                             ...supabase.headers,
@@ -4705,7 +4835,7 @@
             }
             
             pet.pagamentoCollapsed = !pet.pagamentoCollapsed;
-            salvarPets();
+            salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             mostrarPets();
         }
 
@@ -4728,7 +4858,7 @@
                 pet.valorRecebido = pet.valorPix || 50.00;
             }
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             mostrarPets();
             mostrarMensagem(`✅ ${pet.nomePet} marcado como PAGO e arquivado!`, 'success');
         }
@@ -4748,7 +4878,7 @@
             pet.arquivado = true;
             pet.dataPagamento = new Date().toISOString();
             
-            await salvarPets();
+            await salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             mostrarPets();
             mostrarMensagem(`❌ ${pet.nomePet} marcado como NÃO PAGO e arquivado!`, 'warning');
         }
@@ -4770,7 +4900,7 @@
             pet.dataPagamento = new Date().toISOString();
             pet.arquivado = true;
             
-            salvarPets();
+            salvarPets(); // SALVA NO LOCALSTORAGE E SUPABASE
             mostrarPets();
             
             mostrarMensagem(`✅ Valor de R$ ${valor.toFixed(2).replace('.', ',')} registrado! Pet arquivado.`, 'success');
@@ -4908,8 +5038,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
